@@ -24,5 +24,13 @@ pip install -q -U google-genai
 ```
 > **Note**: *Python 3.9+* is required for using the google-genai API.
 
-Get a Gemini API key:
-1) Go to 
+Set up the Gemini API key:
+1) Go to https://aistudio.google.com/prompts/new_chat
+2) Log-in or register with you google credentials
+2) Click on **"Get API key"** on the top part
+3) Click on **"Create API key"** and copy the API key
+4) On the terminal:
+   ```bash
+   cd ~/your_project
+   export GEMINI_API_KEY="<your_api_key>"
+    ```
