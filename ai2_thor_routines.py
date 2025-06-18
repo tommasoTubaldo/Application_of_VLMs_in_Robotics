@@ -7,7 +7,7 @@ class AI2_Thor():
             # Agent & Scene type
             agentMode="locobot",
             visibilityDistance=1.5,
-            scene="FloorPlan_Val1_3",
+            scene="FloorPlan_Val1_1",   # Available rooms in RoboTHOR: FloorPlan_Train{1:12}_{1:5} or FloorPlan_Val{1:3]_{1:5}, such as FloorPlan_Train3_5 or FloorPlan_Val1_2
 
             # Step size and properties
             gridSize=0.25,
@@ -24,6 +24,8 @@ class AI2_Thor():
             height=896,
             fieldOfView=90
         )
+
+        self.controller.step("Done")
 
     def get_position(self):
         """Returns the current position of the agent as x,y coordinates and yaw angle."""

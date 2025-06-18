@@ -1,0 +1,8 @@
+scene_id,prompt,question_type,answer,object_id
+FloorPlan_Val1_1,What color is the armchair?,color,red,ArmChair|+01.62|+00.00|-01.64
+FloorPlan_Val1_1,What color is the spray?,color,pink,SprayBottle|+02.72|+01.01|-02.73
+FloorPlan_Val1_1,Is there a blue vase?,existence,yes,Vase|+05.85|+00.72|-04.47
+FloorPlan_Val1_1,What is next to the alarm?,preposition,lamp,AlarmClock|+07.55|+00.54|-04.01
+FloorPlan_Val1_1,What is next to the mug?,preposition,laptop,Mug|+01.40|+00.72|-03.94
+FloorPlan_Val1_4,Is there a tennis racket?,existence,no,
+FloorPlan_Val1_5,How many lamps in the house?,count,three,

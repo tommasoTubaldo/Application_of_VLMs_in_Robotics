@@ -1,27 +1,26 @@
-import asyncio
+import asyncio, eval
 from colorama import init, Fore
 from gemini import GeminiAPI
 from ai2_thor_routines import AI2_Thor
 init(autoreset=True)
 
-## Tasks:
-# 1. In the room there is a ball. What sport does it belong to?
-# 2. What breed is the dog?
-
 # Init
 robot = AI2_Thor()
 vlm = GeminiAPI(
-    model="gemini-2.0-flash",
-    #model="gemini-2.5-flash-preview-04-17",
+    #model="gemini-2.0-flash",
+    #model="gemini-2.0-flash-001",
+    model="gemini-2.5-flash",
     temperature=0.2,
     max_tokens=10000
 )
+initial_distance_agent_obj = 3
 
 # Main: executes robot sim and vlm as parallel processes
 async def main():
     await asyncio.gather(
         robot.sim_loop(),
         vlm.chat_loop(robot),
+        #eval.eqa(robot, vlm, initial_distance_agent_obj)
     )
 
 if __name__ == "__main__":

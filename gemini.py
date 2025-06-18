@@ -15,7 +15,7 @@ class GeminiAPI():
 
         # Load system behavior instructions
         prompt_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'VLMs_on_AI2-Thor/prompts'))
-        with open(os.path.join(prompt_dir, "system_instruction.txt"), "r") as f:
+        with open(os.path.join(prompt_dir, "system_instruction_val.txt"), "r") as f:
             self.system_instruction = f.read()
 
         self.conversation_history = []
@@ -23,7 +23,7 @@ class GeminiAPI():
         # Function declarations for the model
         self.set_pos_function = {
             "name": "get_position",
-            "description": "Returns the current position and orientation of the robot as a 3-element vector: [x, y, theta], where x and y are the robot coordinates in meters and yaw is the orientation angle in radians.",
+            "description": "Returns the current position and orientation of the robot as a 3-element vector: [x, y, yaw], where x and y are the robot coordinates in meters and yaw is the orientation angle in radians.",
             "parameters": {
                 "type": "object",
                 "properties": {}
@@ -181,6 +181,7 @@ class GeminiAPI():
         plt.axis('off')  # Hide axes
         plt.show()
 
+
     def chat(self, robot):
         """
         Generates a response using the current conversation history and tools.
@@ -217,7 +218,7 @@ class GeminiAPI():
                         else:
                             raise RuntimeError(f"Exceeded retry limit due to repeated Server errors: {e}")
 
-                    elif "503" in str(e) or "UNAVAILABLE" in str(e):
+                    elif "503" in str(e) or "502" in str(e) or "UNAVAILABLE" in str(e):
                         if retries < max_retries:
                             print(Fore.RED + f"[503 Error] Retrying in {retry_delay} seconds..." + Style.RESET_ALL)
                             time.sleep(retry_delay)
@@ -228,7 +229,7 @@ class GeminiAPI():
                     else:
                         raise e
 
-            # Check if tool call is made
+            # Process response
             for part in response.candidates[0].content.parts:
                 if part.text:
                     print(Fore.BLUE + "\nAssistant:" + Style.RESET_ALL)
@@ -294,6 +295,113 @@ class GeminiAPI():
                         robot.controller.step("Done")
                         self.conversation_history = contents
                         return response
+
+
+    def chat_no_prints(self, robot):
+        """
+        Generates a response using the current conversation history and tools.
+
+        :param robot: Robot instance
+        :return: Prediction from Gemini
+        """
+        contents = list(self.conversation_history)
+        path = []
+
+        while True:
+            # Binary exponential backoff parameters
+            max_retries = 10
+            retry_delay = 2  # seconds (initial delay)
+            retries = 0
+
+            # Handle 429 and 503 exceptions adopting a binary exponential backoff algorithm
+            while True:
+                try:
+                    response = self.client.models.generate_content(
+                        model=self.model,
+                        config=self.config,
+                        contents=contents
+                    )
+                    break
+                except Exception as e:
+                    if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                        if retries < max_retries:
+                            #print(Fore.RED + f"[429 Error] Retrying in {retry_delay} seconds..." + Style.RESET_ALL)
+                            time.sleep(retry_delay)
+                            retries += 1
+                            retry_delay *= 2
+                        else:
+                            raise RuntimeError(f"Exceeded retry limit due to repeated Server errors: {e}")
+
+                    elif "503" in str(e) or "UNAVAILABLE" in str(e):
+                        if retries < max_retries:
+                            #print(Fore.RED + f"[503 Error] Retrying in {retry_delay} seconds..." + Style.RESET_ALL)
+                            time.sleep(retry_delay)
+                            retries += 1
+                            retry_delay *= 2
+                        else:
+                            raise RuntimeError(f"Exceeded retry limit due to repeated Server errors: {e}")
+                    else:
+                        raise e
+
+            # Save agent position
+            path.append(robot.controller.last_event.metadata["agent"]["position"])
+
+            # Check if tool call is made
+            for part in response.candidates[0].content.parts:
+                if part.text:
+                    contents.append(types.Content(role="user", parts=[types.Part(text=part.text)]))
+
+                if part.function_call:
+                    tool_call = part.function_call
+
+                    if tool_call.name == "get_position":
+                        result = robot.get_position()
+
+                        function_response_part = types.Part.from_function_response(name=tool_call.name,response={"result": result},)
+
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[function_response_part]))
+
+                    elif tool_call.name == "get_image":
+                        result = self.image_to_base64(robot.get_image())
+
+                        function_response_part = types.Part(inline_data=types.Blob(mime_type="image/jpeg", data=result))
+
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[function_response_part]))
+
+                    elif tool_call.name == "move_forward":
+                        robot.move_forward(**tool_call.args)
+
+                        # Append function call and result of the function execution to contents
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[types.Part(text=f"The robot has moved forward by {tool_call.args} meters")]))
+
+                    elif tool_call.name == "move_backward":
+                        robot.move_backward(**tool_call.args)
+
+                        # Append function call and result of the function execution to contents
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[types.Part(text=f"The robot has moved backward by {tool_call.args} meters")]))
+
+                    elif tool_call.name == "rotate_right":
+                        robot.rotate_right(**tool_call.args)
+
+                        # Append function call and result of the function execution to contents
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[types.Part(text=f"The robot has rotate to the right by {tool_call.args} degrees")]))
+
+                    elif tool_call.name == "rotate_left":
+                        robot.rotate_left(**tool_call.args)
+
+                        # Append function call and result of the function execution to contents
+                        contents.append(types.Content(role="model", parts=[types.Part(function_call=tool_call)]))
+                        contents.append(types.Content(role="user", parts=[types.Part(text=f"The robot has has rotate to the left by {tool_call.args} degrees")]))
+
+                    elif tool_call.name == "response_completed":
+                        event = robot.controller.step("Done")
+                        self.conversation_history = contents
+                        return response, event, path
 
 
     async def chat_loop(self, robot):
