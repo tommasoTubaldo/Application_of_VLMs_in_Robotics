@@ -31,6 +31,6 @@ Set up the Gemini API key:
 3) Click on **"Create API key"** and copy the API key
 4) On the terminal:
    ```bash
-    cd ~/your_project
+   cd ~/your_project
    export GEMINI_API_KEY="<your_api_key>"
     ```
