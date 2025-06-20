@@ -7,20 +7,20 @@ init(autoreset=True)
 # Init
 robot = AI2_Thor()
 vlm = GeminiAPI(
-    #model="gemini-2.0-flash",
+    model="gemini-2.0-flash",
     #model="gemini-2.0-flash-001",
-    model="gemini-2.5-flash",
+    #model="gemini-2.5-flash",
     temperature=0.2,
     max_tokens=10000
 )
-initial_distance_agent_obj = 3
+initial_distance_agent_obj = 5
 
 # Main: executes robot sim and vlm as parallel processes
 async def main():
     await asyncio.gather(
         robot.sim_loop(),
-        vlm.chat_loop(robot),
-        #eval.eqa(robot, vlm, initial_distance_agent_obj)
+        #vlm.chat_loop(robot),
+        eval.eqa(robot, vlm, initial_distance_agent_obj)
     )
 
 if __name__ == "__main__":

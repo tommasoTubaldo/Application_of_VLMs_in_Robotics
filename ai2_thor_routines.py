@@ -19,7 +19,7 @@ class AI2_Thor():
             renderDepthImage=False,
             renderInstanceSegmentation=False,
 
-            # Camera properties
+            # Camera properties (854 x 480)
             width=896,
             height=896,
             fieldOfView=90

@@ -1,4 +1,4 @@
-scene_id,prompt,question_type,answer,object_id
+scene_id,prompt,task_type,ground_truth,object_id
 FloorPlan_Val1_1,What color is the armchair?,color,red,ArmChair|+01.62|+00.00|-01.64
 FloorPlan_Val1_1,What color is the spray?,color,pink,SprayBottle|+02.72|+01.01|-02.73
 FloorPlan_Val1_1,Is there a blue vase?,existence,yes,Vase|+05.85|+00.72|-04.47

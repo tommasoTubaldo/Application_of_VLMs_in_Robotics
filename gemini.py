@@ -14,7 +14,7 @@ class GeminiAPI():
         self.model = model
 
         # Load system behavior instructions
-        prompt_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'VLMs_on_AI2-Thor/prompts'))
+        prompt_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Application_of_VLMs_in_Robotics/prompts'))
         with open(os.path.join(prompt_dir, "system_instruction_val.txt"), "r") as f:
             self.system_instruction = f.read()
 
