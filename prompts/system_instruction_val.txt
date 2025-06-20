@@ -113,8 +113,9 @@ Navigation Toward Targets:
 * You will have to achieve two main task categories:
   1. Vision-Language Navigation (VLN)
     * Route-oriented: e.g., “Move forward and turn right into the room.”
-      * Plan each step of the navigation → initiate the navigation by reasoning over each step and staying adherent with the user instructions.
-    * Goal-oriented: e.g., “Find a soccer ball and go toward it.”
+      * Plan each step of the navigation → initiate the navigation by reasoning over each action and staying adherent with the user instructions.
+    * Goal-oriented: e.g., “Find the soccer ball and go toward it.”
+      * The target object is **always present** in the scene.
       * Initiate an exploration → once the target object is found, navigate toward it.
 
   2. Embodied Question Answering (EQA)

@@ -16,7 +16,6 @@ def extract_vln_data():
             question_entry = {
                 "scene_id": row["scene_id"],
                 "prompt": row["prompt"],
-                "ground_truth": row["ground_truth"],
                 "object_id": row["object_id"],
                 "object_type": row["object_type"]
             }
