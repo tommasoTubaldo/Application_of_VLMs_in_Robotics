@@ -111,7 +111,7 @@ def check_visibility(event, objectId):
 
 
 async def vln(robot, model, initial_distance_agent_obj):
-    print(Fore.CYAN + "\n--------------    Vision Language Navigation    --------------\n" + Style.RESET_ALL)
+    print(Fore.CYAN + "\n\n------------------        Vision Language Navigation        ------------------\n" + Style.RESET_ALL)
 
     # Extract VLN data
     object_task_data = extract_vln_data()
@@ -184,7 +184,7 @@ async def vln(robot, model, initial_distance_agent_obj):
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "      --------------        EQA results        --------------")
+    print(Fore.GREEN + "\n\n------------------------        VLN results        ------------------------\n")
     print(results)
     results.to_csv("results/vln_results.csv")
 
@@ -194,7 +194,7 @@ async def vln(robot, model, initial_distance_agent_obj):
 
 
 async def eqa(robot, model, initial_distance_agent_obj):
-    print(Fore.BLUE + "\n--------------    Embodied Question Answering    --------------\n" + Style.RESET_ALL)
+    print(Fore.BLUE + "\n\n------------------        Embodied Question Answering        ------------------\n" + Style.RESET_ALL)
 
     # Extract EQA data
     color_questions, preposition_questions, existence_questions, count_questions = extract_eqa_questions()
@@ -399,7 +399,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "      --------------        EQA results        --------------")
+    print(Fore.GREEN + "\n\n------------------------        EQA results        ------------------------\n")
     print(results)
     results.to_csv("results/eqa_results.csv")
 

@@ -48,7 +48,8 @@ Autonomous Exploration:
     * Issue a sequence of rotate_left with angle 90.
     * At each step:
       * Capture a new image with `get_image`
-      * Maintain **memory of overall rotation** (e.g. I have rotated in total 90°. I still need to rotate another 270° for completing a full rotation) .
+      * Maintain **memory of overall rotation** (e.g. I have rotated in total 90°. I still need to rotate another 270° for completing a full rotation).
+      * Describe each object you see.
     * Stop once a full 360° rotation is completed and all directions have been visually inspected.
 
     * If the target object is detected during the scan:
@@ -58,11 +59,11 @@ Autonomous Exploration:
         * If the instruction involves approaching it, move toward it.
 
     **Phase 2 — Move to New Areas:**
-      * If the target is still not found after the 360° scan, it means that it is in another area or room. Thus, we need to find and move to a new area:
+      * If the target is still not found after the 360° scan, it means that it is in another area or room. Thus, we need to move to a new area to find it:
         * Perform a **new 360° scan**, focused solely on finding a viable direction to explore.
-          * Issue a sequence of rotate_left with angle 90.
+          * Issue a sequence of rotate_left with angle 45.
           * After each rotation:
-            * Use get_image and carefully examine the new image to detect **new objects**, **doorways**, **openings**, **corridors**, or **rooms** in the distance.
+            * Use get_image and carefully examine the new image to detect **doorways**, **openings**, **corridors**, or **rooms** in the distance.
             * Disregard areas with already seen objects or **blocked by other objects** (e.g., armchair, sofas, tables).
             * Briefly describe the scene, emphasizing potential passageways or depth.
           * If an image confirms a clear path (e.g., visible floor leading through a door):
@@ -73,8 +74,9 @@ Autonomous Exploration:
               * Use move_forward with distance = 0.25.
               * Use one rotate_left or rotate_right with angle between 15 and 45 to center the path (e.g., the hallway is slightly on the left → rotate_left).
               * Use get_image to take a new image and **reason** on the navigation progress.
-              * If you are blocked (e.g., there is something in front of you or **you used more than 5 move-forward**):
+              * If you are blocked (e.g., there is something in front of you) or **you used more than 8 move_forward**:
                 * Use rotate_left or rotate_right with angle 30 (e.g., you are blocked by a chair on the right → rotate_left).
+                * If you are still stuck, perform a 360° scan with angle 45 to find the path.
               * Stop **only** if:
                 * A new area is clearly entered, and **you reached new objects**.
 
