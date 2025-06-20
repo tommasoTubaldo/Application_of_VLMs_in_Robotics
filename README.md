@@ -19,7 +19,7 @@ git clone https://github.com/tommasoTubaldo/Application_of_VLMs_in_Robotics.git
 
 Install all necessary dependencies:
 ```bash
-pip install -r requirements.txt
+pip install -qr requirements.txt
 pip install -q -U google-genai
 ```
 > **Note**: *Python 3.9+* is required for using the google-genai API.
