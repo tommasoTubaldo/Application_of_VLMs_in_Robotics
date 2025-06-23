@@ -33,7 +33,7 @@ def extract_eqa_questions():
     preposition_questions = []
 
     # Read the CSV file
-    with open("data/eqa.csv", newline='', encoding='utf-8') as csvfile:
+    with open("eqa_test.csv", newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             question_entry = {
@@ -402,7 +402,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n------------------------        EQA results        ------------------------\n")
+    print(Fore.GREEN + "\n\n-------------------------        EQA results        -------------------------\n")
     print(results)
     os.makedirs("results", exist_ok=True)
     results.to_csv("results/eqa_results.csv")

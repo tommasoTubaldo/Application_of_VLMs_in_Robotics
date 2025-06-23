@@ -237,6 +237,7 @@ class GeminiAPI():
                     print(Fore.YELLOW + f"[Inference time: {end_time - start_time:.2f} s]" + Style.RESET_ALL)
 
                     contents.append(types.Content(role="user", parts=[types.Part(text=part.text)]))
+                    last_response = part.text
 
                 if part.function_call:
                     tool_call = part.function_call
@@ -294,7 +295,7 @@ class GeminiAPI():
                     elif tool_call.name == "response_completed":
                         robot.controller.step("Done")
                         self.conversation_history = contents
-                        return response
+                        return last_response
 
 
     def chat_no_prints(self, robot):
@@ -350,6 +351,7 @@ class GeminiAPI():
             for part in response.candidates[0].content.parts:
                 if part.text:
                     contents.append(types.Content(role="user", parts=[types.Part(text=part.text)]))
+                    last_response = last_response = part.text
 
                 if part.function_call:
                     tool_call = part.function_call
@@ -401,7 +403,7 @@ class GeminiAPI():
                     elif tool_call.name == "response_completed":
                         event = robot.controller.step("Done")
                         self.conversation_history = contents
-                        return response, event, path
+                        return last_response, event, path
 
 
     async def chat_loop(self, robot):
@@ -435,4 +437,5 @@ class GeminiAPI():
             self.conversation_history.append(types.Content(role="user", parts=[types.Part(text=user_input)]))
 
             # Call Gemini in non-blocking way
-            await asyncio.to_thread(self.chat, robot)
+            last_response = await asyncio.to_thread(self.chat, robot)
+            print(last_response)

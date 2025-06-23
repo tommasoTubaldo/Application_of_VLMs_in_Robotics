@@ -1,5 +1,7 @@
 import asyncio
 from ai2thor.controller import Controller
+from ai2thor.platform import CloudRendering
+
 
 class AI2_Thor():
     def __init__(self):
@@ -22,7 +24,10 @@ class AI2_Thor():
             # Camera properties (854 x 480)
             width=896,
             height=896,
-            fieldOfView=90
+            fieldOfView=90,
+
+            # Headless setup
+            #platform=CloudRendering
         )
 
         self.controller.step("Done")
