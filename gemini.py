@@ -12,6 +12,8 @@ init(autoreset=True)
 class GeminiAPI():
     def __init__(self, model, temperature:float = 0.7, max_tokens:int = 1e5, generate_with_tools:bool = True):
         self.model = model
+        PROJECT_ID = "gen-api-vertex-ai"
+        LOCATION = "europe-west1"
 
         # Load system behavior instructions
         prompt_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Application_of_VLMs_in_Robotics/prompts'))
@@ -144,7 +146,8 @@ class GeminiAPI():
         )
 
         # Configure the client
-        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        #self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        self.client = genai.Client(project=PROJECT_ID, location=LOCATION, vertexai=True)
 
     def image_to_base64(self, image: Union[np.ndarray, "np.uint8"]) -> str:
         """Converts an image in format numpy.uint8 in base64"""
@@ -351,7 +354,7 @@ class GeminiAPI():
             for part in response.candidates[0].content.parts:
                 if part.text:
                     contents.append(types.Content(role="user", parts=[types.Part(text=part.text)]))
-                    last_response = last_response = part.text
+                    last_response = part.text
 
                 if part.function_call:
                     tool_call = part.function_call
@@ -438,4 +441,3 @@ class GeminiAPI():
 
             # Call Gemini in non-blocking way
             last_response = await asyncio.to_thread(self.chat, robot)
-            print(last_response)
