@@ -33,7 +33,7 @@ def extract_eqa_questions():
     preposition_questions = []
 
     # Read the CSV file
-    with open("eqa_test.csv", newline='', encoding='utf-8') as csvfile:
+    with open("data/eqa.csv", newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             question_entry = {
