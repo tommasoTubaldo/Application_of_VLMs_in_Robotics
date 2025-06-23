@@ -24,7 +24,6 @@ FloorPlan_Val1_5,Is there a newspaper?,existence,yes,Newspaper|+01.74|+00.45|-01
 FloorPlan_Val1_5,What is on the table?,preposition,statue,Statue|+09.11|+00.46|-02.99
 FloorPlan_Val1_5,What is front of the red chair?,preposition,laptop,Laptop|+05.74|+00.47|-02.46
 FloorPlan_Val1_5,How many lamps in the house?,count,three,
-
 FloorPlan_Val2_1,What color is the pillow?,color,blue,Pillow|+01.60|+00.81|-01.36
 FloorPlan_Val2_1,Is there a tv?,existence,yes,Television|+04.04|+00.96|-01.66
 FloorPlan_Val2_1,Is there a baseball bat?,existence,yes,BaseballBat|+01.28|+00.41|-04.15
@@ -50,29 +49,28 @@ FloorPlan_Val2_5,What color is the apple?,color,green,Apple|+02.60|+00.52|-03.62
 FloorPlan_Val2_5,Is there a tennis racket?,existence,yes,
 FloorPlan_Val2_5,What is next to the plant?,preposition,book,Book|+05.41|+00.43|-04.59
 FloorPlan_Val2_5,What is next to the tv?,preposition,remote,Television|+09.15|+01.20|-03.34
-
-FloorPlan_Val3_1,What color is the pillow?,color,purple,
-FloorPlan_Val3_1,What color is the spray?,color,blue,
-FloorPlan_Val3_1,Is there a basketball?,existence,no,
-FloorPlan_Val3_1,What is next to the alarm?,preposition,mug,
-FloorPlan_Val3_1,What is on the armchair?,preposition,book,
-FloorPlan_Val3_2,What color is the sofa?,color,blue,
-FloorPlan_Val3_2,What color is the bed?,color,white,
+FloorPlan_Val3_1,What color is the pillow?,color,purple,Pillow|+09.40|+00.53|-01.55
+FloorPlan_Val3_1,What color is the spray?,color,blue,SprayBottle|+05.69|+01.30|-01.93
+FloorPlan_Val3_1,Is there a painting?,existence,yes,
+FloorPlan_Val3_1,What is next to the alarm?,preposition,mug,AlarmClock|+09.51|+00.67|-02.24
+FloorPlan_Val3_1,What is on the armchair?,preposition,book,ArmChair|+01.86|+00.00|-04.08
+FloorPlan_Val3_2,What color is the sofa?,color,blue,Sofa|+07.87|00.00|-01.50
+FloorPlan_Val3_2,What color is the bed?,color,white,Bed|+01.50|+00.00|-01.93
 FloorPlan_Val3_2,Is there a book?,existence,yes,
-FloorPlan_Val3_2,What is on the sofa?,preposition,remote,
-FloorPlan_Val3_2,What is on the bed?,preposition,laptop,
-FloorPlan_Val3_3,What color is the plate?,color,blue,
-FloorPlan_Val3_3,What color is the garbage can?,color,green,
-FloorPlan_Val3_3,Is there a painting?,existence,yes,
-FloorPlan_Val3_3,What is next to the plant?,preposition,cup,
-FloorPlan_Val3_3,What is next to the basketball?,preposition,pillow,
-FloorPlan_Val3_4,What color is the blanket?,color,blue,
-FloorPlan_Val3_4,What color is the tv?,color,black,
+FloorPlan_Val3_2,What is on the sofa?,preposition,remote,Sofa|+07.87|00.00|-01.50
+FloorPlan_Val3_2,What is on the bed?,preposition,laptop,Bed|+01.50|+00.00|-01.93
+FloorPlan_Val3_3,What color is the cup?,color,green,Cup|+08.10|+00.75|-02.56
+FloorPlan_Val3_3,What color is the garbage can?,color,green,GarbageCan|+02.98|-00.01|-04.68
+FloorPlan_Val3_3,Is there a plate?,existence,yes,
+FloorPlan_Val3_3,What is next to the plant?,preposition,cup,HousePlant|+07.96|+00.75|-02.24
+FloorPlan_Val3_3,What is next to the basketball?,preposition,pillow,Pillow|+01.53|+00.50|-01.48
+FloorPlan_Val3_4,What color is the blanket?,color,blue,Bed|+01.90|+00.00|-02.42
+FloorPlan_Val3_4,What color is the tv?,color,black,Television|+09.55|+01.28|-02.26
 FloorPlan_Val3_4,Is there a basketball?,existence,yes,
-FloorPlan_Val3_4,What is on the coffee table?,preposition,remote,
-FloorPlan_Val3_4,What is on the bed?,preposition,racket,
-FloorPlan_Val3_5,What color is the sofa?,color,brown,
-FloorPlan_Val3_5,What color is the garbage can?,color,blue,
+FloorPlan_Val3_4,What is on the coffee table?,preposition,remote,CoffeeTable|+07.13|00.00|-02.32
+FloorPlan_Val3_4,What is on the bed?,preposition,racket,Bed|+01.90|+00.00|-02.42
+FloorPlan_Val3_5,What color is the sofa?,color,brown,Sofa|+08.38|+00.00|-04.42
+FloorPlan_Val3_5,What color is the garbage can?,color,blue,GarbageCan|+01.28|-00.01|-04.66
 FloorPlan_Val3_5,Is there a book?,existence,yes,
-FloorPlan_Val3_5,What is on the armchair?,preposition,phone,
-FloorPlan_Val3_5,What is next to the garbage can?,preposition,box
+FloorPlan_Val3_5,What is on the armchair?,preposition,phone,ArmChair|+06.62|+00.00|-04.41
+FloorPlan_Val3_5,What is next to the garbage can?,preposition,boxGarbageCan|+01.28|-00.01|-04.66
