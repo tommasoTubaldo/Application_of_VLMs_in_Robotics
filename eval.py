@@ -271,6 +271,10 @@ async def eqa(robot, model, initial_distance_agent_obj):
     results.loc["color", "dist_delta"] = dist_delta
     results.loc["color", "dist_min"] = dist_min
 
+    # Print color results
+    print(Fore.GREEN + "\n\n-----------------------        EQA - COLOR  results        -----------------------\n")
+    print(results.loc["color"] + "\n\n")
+
 
     # Process preposition questions
     previous_scene = ""
@@ -300,6 +304,9 @@ async def eqa(robot, model, initial_distance_agent_obj):
         initial_position = random.choice(fixed_distance_positions)
         robot.controller.step(action="Teleport", position=initial_position)
         robot.controller.step(action="Done")
+
+        # Reset model memory
+        model.conversation_history = []
 
         # Provide the question to the model
         model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
@@ -334,6 +341,10 @@ async def eqa(robot, model, initial_distance_agent_obj):
     results.loc["preposition", "dist_delta"] = dist_delta
     results.loc["preposition", "dist_min"] = dist_min
 
+    # Print preposition results
+    print(Fore.GREEN + "\n\n---------------------        EQA - PREPOSITION  results        ---------------------\n")
+    print(results.loc["preposition"] + "\n\n")
+
 
     # Process existence questions
     previous_scene = ""
@@ -348,10 +359,13 @@ async def eqa(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-        # Randomize agent position at fixed distance from the target object
+        # Randomize agent position
         feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
         initial_position = random.choice(feasible_positions)
         robot.controller.step(action="Teleport", position=initial_position)
+
+        # Reset model memory
+        model.conversation_history = []
 
         # Provide the question to the model
         model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
@@ -385,6 +399,9 @@ async def eqa(robot, model, initial_distance_agent_obj):
         initial_position = random.choice(feasible_positions)
         robot.controller.step(action="Teleport", position=initial_position)
 
+        # Reset model memory
+        model.conversation_history = []
+
         # Provide the question to the model
         model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
 
@@ -402,7 +419,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n-------------------------        EQA results        -------------------------\n")
+    print(Fore.GREEN + "\n\n-------------------------        EQA  results        -------------------------\n")
     print(results)
     os.makedirs("results", exist_ok=True)
     results.to_csv("results/eqa_results.csv")
