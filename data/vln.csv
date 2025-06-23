@@ -51,11 +51,11 @@ FloorPlan_Val2_5,Find the mug and go toward it,object,Mug|+05.97|+00.40|-04.46
 FloorPlan_Val2_5,Find the television and go toward it,object,Television|+09.15|+01.20|-03.34
 FloorPlan_Val2_5,Find the basketball and go toward it,object,BasketBall|+01.53|+00.12|-03.93
 
-FloorPlan_Val3_1,Find the plant and go toward it,object,
-FloorPlan_Val3_1,Find the alarm and go toward it,object,
-FloorPlan_Val3_1,Find the sofa and go toward it,object,
-FloorPlan_Val3_1,Find the alarm and go toward it,object,
-FloorPlan_Val3_1,Find the alarm and go toward it,object,
+FloorPlan_Val3_1,Find the apple and go toward it,object,Apple|+02.20|+00.79|-01.68
+FloorPlan_Val3_1,Find the book and go toward it,object,Book|+02.02|+00.51|-03.94
+FloorPlan_Val3_1,Find the plant and go toward it,object,HousePlant|+05.47|+00.46|-02.38
+FloorPlan_Val3_1,Find the bed and go toward it,object,Bed|+08.78|+00.00|-01.55
+FloorPlan_Val3_1,Find the remote control and go toward it,object,RemoteControl|+04.66|+00.72|-02.74
 FloorPlan_Val3_2,Find the alarm and go toward it,object,
 FloorPlan_Val3_2,Find the alarm and go toward it,object,
 FloorPlan_Val3_2,Find the alarm and go toward it,object,
