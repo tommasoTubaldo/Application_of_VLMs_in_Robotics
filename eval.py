@@ -241,7 +241,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
             correct_answers += 1
 
     # Save metrics about count questions
-    results.loc["count", "answer_accuracy"] = correct_answers / len(color_questions)
+    results.loc["count", "answer_accuracy"] = correct_answers / len(count_questions)
 
     # Print count results
     print(Fore.GREEN + "\n\n---------------------        EQA - COUNT  results        ---------------------\n")
@@ -307,9 +307,9 @@ async def eqa(robot, model, initial_distance_agent_obj):
             wrong_but_on_goal_answers += 1
 
     # Save metrics about preposition questions
-    results.loc["preposition", "answer_accuracy"] = correct_answers / len(color_questions)
-    results.loc["preposition", "vision_accuracy"] = wrong_but_seen_answers / len(color_questions)
-    results.loc["preposition", "position_accuracy"] = wrong_but_on_goal_answers / len(color_questions)
+    results.loc["preposition", "answer_accuracy"] = correct_answers / len(preposition_questions)
+    results.loc["preposition", "vision_accuracy"] = wrong_but_seen_answers / len(preposition_questions)
+    results.loc["preposition", "position_accuracy"] = wrong_but_on_goal_answers / len(preposition_questions)
     results.loc["preposition", "dist_termination"] = dist_termination
     results.loc["preposition", "dist_delta"] = dist_delta
     results.loc["preposition", "dist_min"] = dist_min
@@ -351,8 +351,8 @@ async def eqa(robot, model, initial_distance_agent_obj):
         if check_eqa_question(question, last_response):
             correct_answers += 1
 
-    # Save metrics about color questions
-    results.loc["existence", "answer_accuracy"] = correct_answers / len(color_questions)
+    # Save metrics about existence questions
+    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
 
     # Print existence results
     print(Fore.GREEN + "\n\n---------------------        EQA - EXISTENCE  results        ---------------------\n")
