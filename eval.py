@@ -273,7 +273,8 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
     # Print color results
     print(Fore.GREEN + "\n\n-----------------------        EQA - COLOR  results        -----------------------\n")
-    print(results.loc["color"] + "\n\n")
+    print(results.loc["color"])
+    print("\n\n")
 
 
     # Process preposition questions
@@ -343,7 +344,8 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
     # Print preposition results
     print(Fore.GREEN + "\n\n---------------------        EQA - PREPOSITION  results        ---------------------\n")
-    print(results.loc["preposition"] + "\n\n")
+    print(results.loc["preposition"])
+    print("\n\n")
 
 
     # Process existence questions

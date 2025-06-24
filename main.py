@@ -12,14 +12,14 @@ vlm = GeminiAPI(
     temperature=0.2,
     max_tokens=8192
 )
-initial_distance_agent_obj = 5
+initial_distance_agent_obj = 4
 
 # Main: executes robot sim and vlm as parallel processes
 async def main():
     await asyncio.gather(
         robot.sim_loop(),
-        vlm.chat_loop(robot),
-        #eval.eqa(robot, vlm, initial_distance_agent_obj)
+        #vlm.chat_loop(robot),
+        eval.eqa(robot, vlm, initial_distance_agent_obj)
     )
 
 if __name__ == "__main__":

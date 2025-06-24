@@ -34,7 +34,7 @@ FloorPlan_Val2_2,Is there a box?,existence,yes,
 FloorPlan_Val2_2,Is there a newspaper?,existence,no,
 FloorPlan_Val2_2,What is next to the laptop?,preposition,basketball,BasketBall|+03.03|+00.73|-01.30
 FloorPlan_Val2_2,What is next to the plant?,preposition,lamp,DeskLamp|+04.66|+00.59|-02.66
-FloorPlan_Val2_3,What color is the mug?,color,white, Mug|+07.56|+00.74|-02.72
+FloorPlan_Val2_3,What color is the mug?,color,white,Mug|+07.56|+00.74|-02.72
 FloorPlan_Val2_3,Is there a baseball bat?,existence,yes,
 FloorPlan_Val2_3,How many paintings in the house?,count,three,
 FloorPlan_Val2_3,What is above the basketball?,preposition,chair,Chair|+01.34|+00.00|-03.28

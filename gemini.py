@@ -12,7 +12,7 @@ init(autoreset=True)
 class GeminiAPI():
     def __init__(self, model, temperature:float = 0.7, max_tokens:int = 1e5, generate_with_tools:bool = True):
         self.model = model
-        PROJECT_ID = "gen-api-vertex-ai"
+        PROJECT_ID = "vertex-ai-463817"
         LOCATION = "europe-west1"
 
         # Load system behavior instructions
