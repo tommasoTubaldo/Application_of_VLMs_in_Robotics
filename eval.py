@@ -139,14 +139,15 @@ async def vln(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-        # Randomize agent position at fixed distance from the target object
-        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+            # Randomize agent position at fixed distance from the target object
+            feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
 
-        fixed_distance_positions = []
-        for pos in feasible_positions:
-            position_vec = [pos["x"], pos["y"], pos["z"]]
-            if compute_distance(init_event, task["object_id"], position_vec) < initial_distance_agent_obj:
-                fixed_distance_positions.append(pos)
+            fixed_distance_positions = []
+            distance_threshold = 0.05
+            for pos in feasible_positions:
+                position_vec = [pos["x"], pos["y"], pos["z"]]
+                if abs(compute_distance(init_event, task["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
+                    fixed_distance_positions.append(pos)
 
         initial_position = random.choice(fixed_distance_positions)
         robot.controller.step(action="Teleport", position=initial_position)
@@ -165,7 +166,7 @@ async def vln(robot, model, initial_distance_agent_obj):
         if path_length < best_path_length:
             dist_termination = distance_from_obj
             initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
-            dist_delta = compute_distance(event, task["object_id"], initial_position_vec) - dist_termination
+            dist_delta = dist_termination - compute_distance(event, task["object_id"], initial_position_vec)
             dist_min = compute_minimum_distance_from_obj(event, task["object_id"], path)
 
         # SR and SPL information
@@ -227,9 +228,10 @@ async def eqa(robot, model, initial_distance_agent_obj):
         feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
 
         fixed_distance_positions = []
+        distance_threshold = 0.05
         for pos in feasible_positions:
             position_vec = [pos["x"], pos["y"], pos["z"]]
-            if compute_distance(init_event, question["object_id"], position_vec) < initial_distance_agent_obj:
+            if abs(compute_distance(init_event, question["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
                 fixed_distance_positions.append(pos)
 
         initial_position = random.choice(fixed_distance_positions)
@@ -253,7 +255,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
         if path_length < best_path_length:
             dist_termination = distance_from_obj
             initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
-            dist_delta = compute_distance(event, question["object_id"], initial_position_vec) - dist_termination
+            dist_delta = dist_termination - compute_distance(event, question["object_id"], initial_position_vec)
             dist_min = compute_minimum_distance_from_obj(event, question["object_id"], path)
 
         # Accuracy information
