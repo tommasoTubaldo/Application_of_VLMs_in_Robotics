@@ -209,6 +209,46 @@ async def eqa(robot, model, initial_distance_agent_obj):
     distance_threshold = 0.1
 
 
+    # Process existence questions
+    previous_scene = ""
+    correct_answers = 0
+
+    for question in tqdm(existence_questions, desc="Processing EXISTENCE questions"):
+        # Set the current scene if changed
+        if question["scene_id"] != previous_scene:
+            robot.controller.reset(scene=question["scene_id"])
+            previous_scene = question["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Randomize agent position
+        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+        initial_position = random.choice(feasible_positions)
+        robot.controller.step(action="Teleport", position=initial_position)
+
+        # Reset model memory
+        model.conversation_history = []
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
+
+        # Accuracy information
+        if check_eqa_question(question, last_response):
+            correct_answers += 1
+
+    # Save metrics about existence questions
+    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
+
+    # Print existence results
+    print(Fore.GREEN + "\n\n---------------------        EQA - EXISTENCE  results        ---------------------\n")
+    print(results.loc["existence"])
+    print("\n\n")
+
+
     # Process count questions
     previous_scene = ""
     correct_answers = 0
@@ -319,45 +359,6 @@ async def eqa(robot, model, initial_distance_agent_obj):
     print(results.loc["preposition"])
     print("\n\n")
 
-
-    # Process existence questions
-    previous_scene = ""
-    correct_answers = 0
-
-    for question in tqdm(existence_questions, desc="Processing EXISTENCE questions"):
-        # Set the current scene if changed
-        if question["scene_id"] != previous_scene:
-            robot.controller.reset(scene=question["scene_id"])
-            previous_scene = question["scene_id"]
-
-            # Extract objects metadata
-            init_event = robot.controller.last_event
-
-        # Randomize agent position
-        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-        initial_position = random.choice(feasible_positions)
-        robot.controller.step(action="Teleport", position=initial_position)
-
-        # Reset model memory
-        model.conversation_history = []
-
-        # Provide the question to the model
-        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
-
-        # Call Gemini in non-blocking way
-        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
-
-        # Accuracy information
-        if check_eqa_question(question, last_response):
-            correct_answers += 1
-
-    # Save metrics about existence questions
-    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
-
-    # Print existence results
-    print(Fore.GREEN + "\n\n---------------------        EQA - EXISTENCE  results        ---------------------\n")
-    print(results.loc["existence"])
-    print("\n\n")
 
 
     # Show and save overall results as csv file
