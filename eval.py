@@ -139,16 +139,19 @@ async def vln(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-            # Randomize agent position at fixed distance from the target object
-            feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+        # Randomize agent position at fixed distance from the target object
+        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
 
-            fixed_distance_positions = []
-            for pos in feasible_positions:
-                position_vec = [pos["x"], pos["y"], pos["z"]]
-                if abs(compute_distance(init_event, task["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
-                    fixed_distance_positions.append(pos)
+        fixed_distance_positions = []
+        for pos in feasible_positions:
+            position_vec = [pos["x"], pos["y"], pos["z"]]
+            if abs(compute_distance(init_event, task["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
+                fixed_distance_positions.append(pos)
 
-        initial_position = random.choice(fixed_distance_positions)
+        try:
+            initial_position = random.choice(fixed_distance_positions)
+        except IndexError:
+            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
         robot.controller.step(action="Teleport", position=initial_position)
 
         # Provide the question to the model
@@ -313,7 +316,10 @@ async def eqa(robot, model, initial_distance_agent_obj):
             if abs(compute_distance(init_event, question["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
                 fixed_distance_positions.append(pos)
 
-        initial_position = random.choice(fixed_distance_positions)
+        try:
+            initial_position = random.choice(fixed_distance_positions)
+        except IndexError:
+            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
         robot.controller.step(action="Teleport", position=initial_position)
         robot.controller.step(action="Done")
 
