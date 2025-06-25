@@ -1,76 +1,76 @@
-scene_id,prompt,task_type,object_id
-FloorPlan_Val1_1,Find the alarm  and go toward it,object,AlarmClock|+07.55|+00.54|-04.01
-FloorPlan_Val1_1,Find the vase and go toward it,object,Vase|+05.85|+00.72|-04.47
-FloorPlan_Val1_1,Find the basketball and go toward it,object,BasketBall|+02.35|+00.12|-01.15
-FloorPlan_Val1_1,Find the cellphone and go toward it,object,CellPhone|+03.77|+00.36|-01.32
-FloorPlan_Val1_1,Find the tennis racket and go toward it,object,TennisRacket|+09.66|+00.32|-01.09
-FloorPlan_Val1_2,Find the box and go toward it,object,Box|+06.44|+00.25|-02.32
-FloorPlan_Val1_2,Find the pillow and go toward it,object,Pillow|+09.37|+00.55|-03.63
-FloorPlan_Val1_2,Find the statue and go toward it,object,Statue|+07.16|+00.54|-01.13
-FloorPlan_Val1_2,Find the spray and go toward it,object,SprayBottle|+03.97|+00.59|-02.61
-FloorPlan_Val1_2,Find the television and go toward it,object,Television|+02.67|+00.84|-03.24
-FloorPlan_Val1_3,Find the garbage can and go toward it,object,GarbageCan|+07.81|-00.01|-04.70
-FloorPlan_Val1_3,Find the bottle and go toward it,object,Bottle|+02.16|+00.74|-01.58
-FloorPlan_Val1_3,Find the laptop and go toward it,object,Laptop|+08.28|+00.72|-02.91
-FloorPlan_Val1_3,Find the remote control and go toward it,object,RemoteControl|+02.82|+00.55|-03.48
-FloorPlan_Val1_3,Find the book and go toward it,object,Book|+06.93|+00.59|-03.59
-FloorPlan_Val1_4,Find the bed and go toward it,object,Bed|+02.28|+00.00|-01.69
-FloorPlan_Val1_4,Find the baseball bat and go toward it,object,BaseballBat|+06.10|+00.68|-03.56
-FloorPlan_Val1_4,Find the spray and go toward it,object,SprayBottle|+09.15|+00.74|-02.20
-FloorPlan_Val1_4,Find the laptop and go toward it,object,Laptop|+07.97|+00.74|-03.63
-FloorPlan_Val1_4,Find the television and go toward it,object,Television|+02.46|+01.08|-04.71
-FloorPlan_Val1_5,Find the newspaper and go toward it,object,Newspaper|+01.74|+00.45|-01.37
-FloorPlan_Val1_5,Find the baseball bat and go toward it,object,BaseballBat|+09.71|+00.68|-01.61
-FloorPlan_Val1_5,Find the apple and go toward it,object,Apple|+03.14|+00.81|-04.37
-FloorPlan_Val1_5,Find the tennis racket and go toward it,object,TennisRacket|+04.30|+00.33|-01.06
-FloorPlan_Val1_5,Find the alarm and go toward it,object,AlarmClock|+05.48|+00.47|-02.23
-FloorPlan_Val2_1,Find the laptop and go toward it,object,Laptop|+09.18|+00.71|-02.41
-FloorPlan_Val2_1,Find the cellphone and go toward it,object,CellPhone|+01.54|+00.44|-03.77
-FloorPlan_Val2_1,Find the sofa and go toward it,object,Sofa|+05.34|+00.00|-03.41
-FloorPlan_Val2_1,Find the plant and go toward it,object,HousePlant|+04.72|+00.71|-01.51
-FloorPlan_Val2_1,Find the pillow and go toward it,object,Pillow|+01.60|+00.81|-01.36
-FloorPlan_Val2_2,Find the teddy bear and go toward it,object,TeddyBear|+07.69|+00.46|-03.47
-FloorPlan_Val2_2,Find the remote control and go toward it,object,RemoteControl|+01.50|+00.40|-04.01
-FloorPlan_Val2_2,Find the television and go toward it,object,Television|+09.63|+01.08|-01.58
-FloorPlan_Val2_2,Find the basketball and go toward it,object,BasketBall|+03.03|+00.73|-01.30
-FloorPlan_Val2_2,Find the spray and go toward it,object,SprayBottle|+09.40|00.00|-01.90
-FloorPlan_Val2_3,Find the newspaper and go toward it,object,Newspaper|+09.16|+00.42|-02.28
-FloorPlan_Val2_3,Find the mug and go toward it,object,Mug|+07.56|+00.74|-02.72
-FloorPlan_Val2_3,Find the garbage can and go toward it,object,GarbageCan|+09.49|+00.02|-04.21
-FloorPlan_Val2_3,Find the basketball and go toward it,object,BasketBall|+01.44|+00.12|-03.30
-FloorPlan_Val2_3,Find the cellphone and go toward it,object,CellPhone|+01.39|+00.61|-01.94
-FloorPlan_Val2_4,Find the armchair and go toward it,object,ArmChair|+04.87|+00.00|-01.54
-FloorPlan_Val2_4,Find the alarm and go toward it,object,AlarmClock|+09.55|+00.75|-04.20
-FloorPlan_Val2_4,Find the remote control and go toward it,object,RemoteControl|+04.30|+00.48|-04.29
-FloorPlan_Val2_4,Find the teddy bear and go toward it,object,TeddyBear|+01.28|+00.53|-01.30
-FloorPlan_Val2_4,Find the apple and go toward it,object,Apple|+01.64|+00.77|-03.84
-FloorPlan_Val2_5,Find the bed and go toward it,object,Bed|+02.12|00.00|-01.65
-FloorPlan_Val2_5,Find the tennis racket and go toward it,object,TennisRacket|+07.73|+00.33|-03.38
-FloorPlan_Val2_5,Find the mug and go toward it,object,Mug|+05.97|+00.40|-04.46
-FloorPlan_Val2_5,Find the television and go toward it,object,Television|+09.15|+01.20|-03.34
-FloorPlan_Val2_5,Find the basketball and go toward it,object,BasketBall|+01.53|+00.12|-03.93
-FloorPlan_Val3_1,Find the apple and go toward it,object,Apple|+02.20|+00.79|-01.68
-FloorPlan_Val3_1,Find the book and go toward it,object,Book|+02.02|+00.51|-03.94
-FloorPlan_Val3_1,Find the plant and go toward it,object,HousePlant|+05.47|+00.46|-02.38
-FloorPlan_Val3_1,Find the bed and go toward it,object,Bed|+08.78|+00.00|-01.55
-FloorPlan_Val3_1,Find the remote control and go toward it,object,RemoteControl|+04.66|+00.72|-02.74
-FloorPlan_Val3_2,Find the mug and go toward it,object,Mug|+07.52|+00.74|-04.49
-FloorPlan_Val3_2,Find the remote control and go toward it,object,RemoteControl|+08.62|+00.54|-01.70
-FloorPlan_Val3_2,Find the spray and go toward it,object,SprayBottle|+04.94|+00.11|-01.47
-FloorPlan_Val3_2,Find the alarm and go toward it,object,AlarmClock|+02.12|+00.79|-01.32
-FloorPlan_Val3_2,Find the tennis racket and go toward it,object,TennisRacket|+01.20|+00.02|-03.10
-FloorPlan_Val3_3,Find the box and go toward it,object,Box|+05.45|+00.59|-01.74
-FloorPlan_Val3_3,Find the garbage can and go toward it,object,GarbageCan|+02.98|-00.01|-04.68
-FloorPlan_Val3_3,Find the basketball and go toward it,object,BasketBall|+01.47|+00.44|-01.72
-FloorPlan_Val3_3,Find the apple and go toward it,object,Apple|+04.79|+00.77|-01.93
-FloorPlan_Val3_3,Find the baseball bat and go toward it,object,BaseballBat|+05.02|+00.04|-02.40
-FloorPlan_Val3_4,Find the tennis racket and go toward it,object,TennisRacket|+02.27|+00.61|-03.08
-FloorPlan_Val3_4,Find the spray and go toward it,object,SprayBottle|+03.98|00.00|-01.43
-FloorPlan_Val3_4,Find the box and go toward it,object,Box|+01.93|+00.30|-04.54
-FloorPlan_Val3_4,Find the television and go toward it,object,Television|+09.55|+01.28|-02.26
-FloorPlan_Val3_4,Find the plant and go toward it,object,HousePlant|+07.14|+00.47|-01.98
-FloorPlan_Val3_5,Find the armchair and go toward it,object,ArmChair|+06.62|+00.00|-04.41
-FloorPlan_Val3_5,Find the newspaper and go toward it,object,Newspaper|+07.66|+00.24|-01.56
-FloorPlan_Val3_5,Find the box and go toward it,object,Box|+01.72|+00.24|-04.57
-FloorPlan_Val3_5,Find the laptop and go toward it,object,Laptop|+04.18|+00.74|-02.26
-FloorPlan_Val3_5,Find the spray and go toward it,object,SprayBottle|+01.35|+01.47|-01.18
+scene_id,prompt,task_type,object_id,object_type
+FloorPlan_Val1_1,Find the alarm and go towards it,object,AlarmClock|+07.55|+00.54|-04.01,AlarmClock
+FloorPlan_Val1_1,Find the vase and go towards it,object,Vase|+05.85|+00.72|-04.47,Vase
+FloorPlan_Val1_1,Find the basketball and go towards it,object,BasketBall|+02.35|+00.12|-01.15,BasketBall
+FloorPlan_Val1_1,Find the cellphone and go towards it,object,CellPhone|+03.77|+00.36|-01.32,CellPhone
+FloorPlan_Val1_1,Find the tennis racket and go towards it,object,TennisRacket|+09.66|+00.32|-01.09,TennisRacket
+FloorPlan_Val1_2,Find the box and go towards it,object,Box|+06.44|+00.25|-02.32,Box
+FloorPlan_Val1_2,Find the pillow and go towards it,object,Pillow|+09.37|+00.55|-03.63,Pillow
+FloorPlan_Val1_2,Find the statue and go towards it,object,Statue|+07.16|+00.54|-01.13,Statue
+FloorPlan_Val1_2,Find the spray and go towards it,object,SprayBottle|+03.97|+00.59|-02.61,SprayBottle
+FloorPlan_Val1_2,Find the television and go towards it,object,Television|+02.67|+00.84|-03.24,Television
+FloorPlan_Val1_3,Find the garbage can and go towards it,object,GarbageCan|+07.81|-00.01|-04.70,GarbageCan
+FloorPlan_Val1_3,Find the bottle and go towards it,object,Bottle|+02.16|+00.74|-01.58,Bottle
+FloorPlan_Val1_3,Find the laptop and go towards it,object,Laptop|+08.28|+00.72|-02.91,Laptop
+FloorPlan_Val1_3,Find the remote control and go towards it,object,RemoteControl|+02.82|+00.55|-03.48,RemoteControl
+FloorPlan_Val1_3,Find the book and go towards it,object,Book|+06.93|+00.59|-03.59,Book
+FloorPlan_Val1_4,Find the bed and go towards it,object,Bed|+02.28|+00.00|-01.69,Bed
+FloorPlan_Val1_4,Find the baseball bat and go towards it,object,BaseballBat|+06.10|+00.68|-03.56,BaseballBat
+FloorPlan_Val1_4,Find the spray and go towards it,object,SprayBottle|+09.15|+00.74|-02.20,SprayBottle
+FloorPlan_Val1_4,Find the laptop and go towards it,object,Laptop|+07.97|+00.74|-03.63,Laptop
+FloorPlan_Val1_4,Find the television and go towards it,object,Television|+02.46|+01.08|-04.71,Television
+FloorPlan_Val1_5,Find the newspaper and go towards it,object,Newspaper|+01.74|+00.45|-01.37,Newspaper
+FloorPlan_Val1_5,Find the baseball bat and go towards it,object,BaseballBat|+09.71|+00.68|-01.61,BaseballBat
+FloorPlan_Val1_5,Find the apple and go towards it,object,Apple|+03.14|+00.81|-04.37,Apple
+FloorPlan_Val1_5,Find the tennis racket and go towards it,object,TennisRacket|+04.30|+00.33|-01.06,TennisRacket
+FloorPlan_Val1_5,Find the alarm and go towards it,object,AlarmClock|+05.48|+00.47|-02.23,AlarmClock
+FloorPlan_Val2_1,Find the laptop and go towards it,object,Laptop|+09.18|+00.71|-02.41,Laptop
+FloorPlan_Val2_1,Find the cellphone and go towards it,object,CellPhone|+01.54|+00.44|-03.77,CellPhone
+FloorPlan_Val2_1,Find the sofa and go towards it,object,Sofa|+05.34|+00.00|-03.41,Sofa
+FloorPlan_Val2_1,Find the plant and go towards it,object,HousePlant|+04.72|+00.71|-01.51,HousePlant
+FloorPlan_Val2_1,Find the pillow and go towards it,object,Pillow|+01.60|+00.81|-01.36,Pillow
+FloorPlan_Val2_2,Find the teddy bear and go towards it,object,TeddyBear|+07.69|+00.46|-03.47,TeddyBear
+FloorPlan_Val2_2,Find the remote control and go towards it,object,RemoteControl|+01.50|+00.40|-04.01,RemoteControl
+FloorPlan_Val2_2,Find the television and go towards it,object,Television|+09.63|+01.08|-01.58,Television
+FloorPlan_Val2_2,Find the basketball and go towards it,object,BasketBall|+03.03|+00.73|-01.30,BasketBall
+FloorPlan_Val2_2,Find the spray and go towards it,object,SprayBottle|+09.40|00.00|-01.90,SprayBottle
+FloorPlan_Val2_3,Find the newspaper and go towards it,object,Newspaper|+09.16|+00.42|-02.28,Newspaper
+FloorPlan_Val2_3,Find the mug and go towards it,object,Mug|+07.56|+00.74|-02.72,Mug
+FloorPlan_Val2_3,Find the garbage can and go towards it,object,GarbageCan|+09.49|+00.02|-04.21,GarbageCan
+FloorPlan_Val2_3,Find the basketball and go towards it,object,BasketBall|+01.44|+00.12|-03.30,BasketBall
+FloorPlan_Val2_3,Find the cellphone and go towards it,object,CellPhone|+01.39|+00.61|-01.94,CellPhone
+FloorPlan_Val2_4,Find the armchair and go towards it,object,ArmChair|+04.87|+00.00|-01.54,ArmChair
+FloorPlan_Val2_4,Find the alarm and go towards it,object,AlarmClock|+09.55|+00.75|-04.20,AlarmClock
+FloorPlan_Val2_4,Find the remote control and go towards it,object,RemoteControl|+04.30|+00.48|-04.29,RemoteControl
+FloorPlan_Val2_4,Find the teddy bear and go towards it,object,TeddyBear|+01.28|+00.53|-01.30,TeddyBear
+FloorPlan_Val2_4,Find the apple and go towards it,object,Apple|+01.64|+00.77|-03.84,Apple
+FloorPlan_Val2_5,Find the bed and go towards it,object,Bed|+02.12|00.00|-01.65,Bed
+FloorPlan_Val2_5,Find the tennis racket and go towards it,object,TennisRacket|+07.73|+00.33|-03.38,TennisRacket
+FloorPlan_Val2_5,Find the mug and go towards it,object,Mug|+05.97|+00.40|-04.46,Mug
+FloorPlan_Val2_5,Find the television and go towards it,object,Television|+09.15|+01.20|-03.34,Television
+FloorPlan_Val2_5,Find the basketball and go towards it,object,BasketBall|+01.53|+00.12|-03.93,BasketBall
+FloorPlan_Val3_1,Find the apple and go towards it,object,Apple|+02.20|+00.79|-01.68,Apple
+FloorPlan_Val3_1,Find the book and go towards it,object,Book|+02.02|+00.51|-03.94,Book
+FloorPlan_Val3_1,Find the plant and go towards it,object,HousePlant|+05.47|+00.46|-02.38,HousePlant
+FloorPlan_Val3_1,Find the bed and go towards it,object,Bed|+08.78|+00.00|-01.55,Bed
+FloorPlan_Val3_1,Find the remote control and go towards it,object,RemoteControl|+04.66|+00.72|-02.74,RemoteControl
+FloorPlan_Val3_2,Find the mug and go towards it,object,Mug|+07.52|+00.74|-04.49,Mug
+FloorPlan_Val3_2,Find the remote control and go towards it,object,RemoteControl|+08.62|+00.54|-01.70,RemoteControl
+FloorPlan_Val3_2,Find the spray and go towards it,object,SprayBottle|+04.94|+00.11|-01.47,SprayBottle
+FloorPlan_Val3_2,Find the alarm and go towards it,object,AlarmClock|+02.12|+00.79|-01.32,AlarmClock
+FloorPlan_Val3_2,Find the tennis racket and go towards it,object,TennisRacket|+01.20|+00.02|-03.10,TennisRacket
+FloorPlan_Val3_3,Find the box and go towards it,object,Box|+05.45|+00.59|-01.74,Box
+FloorPlan_Val3_3,Find the garbage can and go towards it,object,GarbageCan|+02.98|-00.01|-04.68,GarbageCan
+FloorPlan_Val3_3,Find the basketball and go towards it,object,BasketBall|+01.47|+00.44|-01.72,BasketBall
+FloorPlan_Val3_3,Find the apple and go towards it,object,Apple|+04.79|+00.77|-01.93,Apple
+FloorPlan_Val3_3,Find the baseball bat and go towards it,object,BaseballBat|+05.02|+00.04|-02.40,BaseballBat
+FloorPlan_Val3_4,Find the tennis racket and go towards it,object,TennisRacket|+02.27|+00.61|-03.08,TennisRacket
+FloorPlan_Val3_4,Find the spray and go towards it,object,SprayBottle|+03.98|00.00|-01.43,SprayBottle
+FloorPlan_Val3_4,Find the box and go towards it,object,Box|+01.93|+00.30|-04.54,Box
+FloorPlan_Val3_4,Find the television and go towards it,object,Television|+09.55|+01.28|-02.26,Television
+FloorPlan_Val3_4,Find the plant and go towards it,object,HousePlant|+07.14|+00.47|-01.98,HousePlant
+FloorPlan_Val3_5,Find the armchair and go towards it,object,ArmChair|+06.62|+00.00|-04.41,ArmChair
+FloorPlan_Val3_5,Find the newspaper and go towards it,object,Newspaper|+07.66|+00.24|-01.56,Newspaper
+FloorPlan_Val3_5,Find the box and go towards it,object,Box|+01.72|+00.24|-04.57,Box
+FloorPlan_Val3_5,Find the laptop and go towards it,object,Laptop|+04.18|+00.74|-02.26,Laptop
+FloorPlan_Val3_5,Find the spray and go towards it,object,SprayBottle|+01.35|+01.47|-01.18,SprayBottle
