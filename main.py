@@ -9,7 +9,7 @@ robot = AI2_Thor()
 vlm = GeminiAPI(
     model="gemini-2.0-flash",
     #model="gemini-2.5-flash",
-    temperature=0.2,
+    temperature=0.0,
     max_tokens=8192
 )
 initial_distance_agent_obj = 4
