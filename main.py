@@ -19,7 +19,8 @@ async def main():
     await asyncio.gather(
         robot.sim_loop(),
         #vlm.chat_loop(robot),
-        eval.eqa(robot, vlm, initial_distance_agent_obj)
+        #eval.eqa(robot, vlm, initial_distance_agent_obj)
+        eval.vln(robot, vlm, initial_distance_agent_obj)
     )
 
 if __name__ == "__main__":
