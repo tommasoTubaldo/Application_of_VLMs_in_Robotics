@@ -17,7 +17,6 @@ def extract_vln_data():
                 "scene_id": row["scene_id"],
                 "prompt": row["prompt"],
                 "object_id": row["object_id"],
-                "object_type": row["object_type"]
             }
 
             q_type = row["task_type"]
