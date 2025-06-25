@@ -20,7 +20,7 @@ def extract_vln_data():
             }
 
             q_type = row["task_type"]
-            if q_type == "color":
+            if q_type == "object":
                 object_task.append(question_entry)
 
     return object_task
