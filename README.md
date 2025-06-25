@@ -1,14 +1,39 @@
 # Application of VLMs in Robotics
-### Abstract
-Vision Language Models (VLMs) have recently emerged as a powerful class of multimodal foundation models capable of jointly reasoning over visual inputs and natural language. Unlike traditional deep learning models in robotics, which are typically trained on task-specific small-scale datasets, foundation models are pretrained on internet-scale data, granting them superior generalization capabilities and, in many cases, emergent zero-shot reasoning abilities across unseen tasks.
 
-Integrating the visual and linguistic capabilities of VLMs could significantly expand the applications of robotics, making robotic systems more versatile, intuitive, and capable of interacting with humans in a natural way. Such integration opens up possibilities across a wide range of domains, including natural human-robot interaction, enriched navigation, semantic mapping, descriptive navigation, multimodal perception, object detection, and scene understanding.
+This repository presents the implementation and experiments associated with our research on applying Vision-Language Models (VLMs) to mobile robotics. VLMs are a recent class of multimodal foundation models capable of joint reasoning over images and natural language, offering strong generalization and emergent zero-shot capabilities across diverse tasks.
 
-This work explores the application of VLMs to mobile robotics, with a focus on high-level embodied tasks such as Visual-Language Navigation (VLN) and Embodied Question Answering (EQA).
+### 🔎 What This Project Does
+We connect the reasoning abilities of VLMs with low-level robotic control using a custom function-calling interface, enabling the model to autonomously:
 
-To connect VLMs with low-level robot functionality, we introduce a novel function-calling interface that allows the model to invoke perception and control tools, such as acquiring images, querying positions, or issuing motion commands, autonomously in response to natural language instructions.
+- Capture and interpret visual inputs (e.g., camera images)
 
-We evaluate our approach in the AI2-Thor simulator, enabling rigorous testing in indoor environments. Our results demonstrate that pretrained VLMs, when properly interfaced through tool-augmented architectures, are capable of grounding language in action and perception for closed-loop control. These findings point toward the promising role of foundation models in advancing general-purpose language-driven robot autonomy.
+- Query the robot's state (e.g., position, orientation)
+
+- Execute motion commands (e.g., move, rotate)
+
+This setup empowers the robot to understand and act upon natural language instructions in real-time, enabling complex embodied tasks such as:
+
+- Visual-Language Navigation (VLN)
+
+- Embodied Question Answering (EQA)
+
+- Semantic mapping and scene understanding
+
+- Natural and multimodal human-robot interaction
+
+### 🤔 Why It Matters
+By leveraging foundation models, this project pushes toward general-purpose, intuitive robotic systems, where robots that can see, understand, and act in open-ended environments with minimal or absent task-specific training.
+
+### 📊 Validation
+This repository contains the codebase and tools for executing the validation of the system on **RoboTHOR** by evaluating VLN and EQA tasks. Specifically, the following tasks have been defined:
+- **Vision Language Navigation**
+     - Route-oriented tasks (e.g. "Go towards the front door but before the front door make a left, then through the archway, go to the middle of the middle room and stop”)
+     - Goal-oriented tasks (e.g. "Find a tv and go toward it")
+- **Embodied Question Answering**
+     - Color Questions (e.g. "What color is the sofa?")
+     - Preposition Questions (e.g. "What is on top of the bed?")
+     - Existence Questions (e.g. "Is there a basketball?")
+     - Count QUestions (e.g. "How many paintings are in the house?")
 
 ## Getting Started
 ### Installation
@@ -22,7 +47,29 @@ Install all necessary dependencies:
 pip install -qr requirements.txt
 pip install -q -U google-genai
 ```
-> **Note**: *Python 3.9+* is required for using the google-genai API.
+> **Note**: *Python 3.9+* is required with the google-genai API.
+
+Now, in order to infer with Gemini, you can either use the Google Cloud Services with **Vertex AI** (Reccomended) or the **Gemini API**:
+
+### Vertex AI (Reccomended)
+
+With the Google Cloud Services, you are given $300 of credit to be used with the Vertex AI services, and 90 days of free trial.
+
+First you need to set up a Google Cloud project:
+1) Go to https://console.cloud.google.com/projectselector2/home/dashboard
+2) Select **"Create a new project"**
+3) Choose the project name and select **"Create"**
+4) Then, go to https://cloud.google.com/billing/docs/how-to/verify-billing-enabled#confirm_billing_is_enabled_on_a_project and follow the steps to enable the billings for your project
+5) Then, enable the Vertex AI API through the following link https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com and by selecting your Google Cloud project
+
+Finally, you need to set up the Google Cloud CLI to interface with the Google Cloud Services:
+1) Go to https://cloud.google.com/sdk/docs/install and follow the installation procedure
+2) Once installed and intialized, you can login with
+   ```bash
+   gcloud auth application-default login
+   ```
+
+### Gemini API
 
 Set up the Gemini API key:
 1) Go to https://aistudio.google.com/prompts/new_chat
