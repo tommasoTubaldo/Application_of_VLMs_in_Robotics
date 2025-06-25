@@ -211,6 +211,79 @@ async def eqa(robot, model, initial_distance_agent_obj):
     distance_threshold = 0.2
 
 
+    # Process color questions
+    previous_scene = ""
+    best_path_length = float("inf")
+    correct_answers = 0
+    wrong_but_seen_answers = 0
+    wrong_but_on_goal_answers = 0
+
+    for question in tqdm(color_questions, desc="Processing COLOR questions"):
+        # Set the current scene if changed
+        if question["scene_id"] != previous_scene:
+            robot.controller.reset(scene=question["scene_id"])
+            previous_scene = question["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Randomize agent position at fixed distance from the target object
+        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+
+        fixed_distance_positions = []
+        for pos in feasible_positions:
+            position_vec = [pos["x"], pos["y"], pos["z"]]
+            if abs(compute_distance(init_event, question["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
+                fixed_distance_positions.append(pos)
+
+        try:
+            initial_position = random.choice(fixed_distance_positions)
+        except IndexError:
+            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
+        robot.controller.step(action="Teleport", position=initial_position)
+
+        # Reset model memory
+        model.conversation_history = []
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
+
+        # Compute metrics information
+        distance_from_obj = compute_distance(event, question["object_id"],None)
+        path_length = path_distance(path)
+
+        # Save distance information of shortest path
+        if path_length < best_path_length:
+            dist_termination = distance_from_obj
+            initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
+            dist_delta = compute_distance(event, question["object_id"], initial_position_vec) - dist_termination
+            dist_min = compute_minimum_distance_from_obj(event, question["object_id"], path)
+
+        # Accuracy information
+        if check_eqa_question(question, last_response):
+            correct_answers += 1
+        elif check_visibility(event, question["object_id"]):
+            wrong_but_seen_answers +=1
+        elif distance_from_obj < 1:
+            wrong_but_on_goal_answers += 1
+
+    # Save metrics about color questions
+    results.loc["color", "answer_accuracy"] = correct_answers / len(color_questions)
+    results.loc["color", "vision_accuracy"] = wrong_but_seen_answers / len(color_questions)
+    results.loc["color", "position_accuracy"] = wrong_but_on_goal_answers / len(color_questions)
+    results.loc["color", "dist_termination"] = dist_termination
+    results.loc["color", "dist_delta"] = dist_delta
+    results.loc["color", "dist_min"] = dist_min
+
+    # Print color results
+    print(Fore.GREEN + "\n\n-----------------------        EQA - COLOR  results        -----------------------\n")
+    print(results.loc["color"])
+    print("\n\n")
+
+
     # Process preposition questions
     previous_scene = ""
     best_path_length = float("inf")
@@ -284,6 +357,75 @@ async def eqa(robot, model, initial_distance_agent_obj):
     print(results.loc["preposition"])
     print("\n\n")
 
+
+    # Process existence questions
+    previous_scene = ""
+    correct_answers = 0
+
+    for question in tqdm(existence_questions, desc="Processing EXISTENCE questions"):
+        # Set the current scene if changed
+        if question["scene_id"] != previous_scene:
+            robot.controller.reset(scene=question["scene_id"])
+            previous_scene = question["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Randomize agent position
+        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+        initial_position = random.choice(feasible_positions)
+        robot.controller.step(action="Teleport", position=initial_position)
+
+        # Reset model memory
+        model.conversation_history = []
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
+
+        # Accuracy information
+        if check_eqa_question(question, last_response):
+            correct_answers += 1
+
+    # Save metrics about existence questions
+    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
+
+
+    # Process count questions
+    previous_scene = ""
+    correct_answers = 0
+
+    for question in tqdm(count_questions, desc="Processing COUNT questions"):
+        # Set the current scene if changed
+        if question["scene_id"] != previous_scene:
+            robot.controller.reset(scene=question["scene_id"])
+            previous_scene = question["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Randomize agent position
+        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
+        initial_position = random.choice(feasible_positions)
+        robot.controller.step(action="Teleport", position=initial_position)
+
+        # Reset model memory
+        model.conversation_history = []
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
+
+        # Accuracy information
+        if check_eqa_question(question, last_response):
+            correct_answers += 1
+
+    # Save metrics about count questions
+    results.loc["count", "answer_accuracy"] = correct_answers / len(count_questions)
 
 
     # Show and save overall results as csv file
