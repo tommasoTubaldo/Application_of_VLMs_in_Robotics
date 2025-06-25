@@ -186,7 +186,7 @@ async def vln(robot, model, initial_distance_agent_obj):
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n------------------------        VLN results        ------------------------\n")
+    print(Fore.GREEN + "\n\n------------------------        VLN - OBJECT results        ------------------------\n")
     print(results)
     results.to_csv("results/vln_results.csv")
 
