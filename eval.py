@@ -122,7 +122,7 @@ async def vln(robot, model, initial_distance_agent_obj):
 
     # Set visibility distance of the agent
     robot.controller.reset(visibilityDistance=100)
-
+    distance_threshold = 0.2
 
     # Process object task
     previous_scene = ""
@@ -143,7 +143,6 @@ async def vln(robot, model, initial_distance_agent_obj):
             feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
 
             fixed_distance_positions = []
-            distance_threshold = 0.05
             for pos in feasible_positions:
                 position_vec = [pos["x"], pos["y"], pos["z"]]
                 if abs(compute_distance(init_event, task["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
@@ -206,7 +205,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
     # Set visibility distance of the agent
     robot.controller.reset(visibilityDistance=100)
-    distance_threshold = 0.1
+    distance_threshold = 0.2
 
 
     # Process existence questions
