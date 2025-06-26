@@ -1,8 +1,8 @@
-import asyncio, csv, random, math, os
+import asyncio, csv, random, math, os, ast
 import pandas as pd
 from tqdm import tqdm
 from google.genai import types
-from ai2thor.util.metrics import get_shortest_path_to_object, path_distance, compute_single_spl, vector_distance
+from ai2thor.util.metrics import get_shortest_path_to_object, get_shortest_path_to_point, path_distance, compute_single_spl, vector_distance
 from colorama import Fore, Style, init
 init(autoreset=True)
 
@@ -31,9 +31,9 @@ def extract_vln_data():
             question_entry = {
                 "scene_id": row["scene_id"],
                 "prompt": row["prompt"],
-                "init_position": row["init_position"],
-                "init_orientation": row["init_orientation"],
-                "final_position": row["final_position"]
+                "init_position": ast.literal_eval(row["init_position"]),
+                "init_orientation": ast.literal_eval(row["init_orientation"]),
+                "final_position": ast.literal_eval(row["final_position"]),
             }
 
             q_type = row["task_type"]
@@ -90,6 +90,17 @@ def compute_distance(event, objectId, position):
                 return obj["distance"]
 
     raise ValueError(f"Object with ID '{objectId}' not found in event metadata.")
+
+def compute_minimum_distance_from_pos(position, path):
+    minimum_distance = float("inf")
+
+    for path_pos in path:
+        distance = vector_distance(position, path_pos)
+
+        if distance < minimum_distance:
+            minimum_distance = distance
+
+    return minimum_distance
 
 def compute_minimum_distance_from_obj(event, objectId, path):
     # Convert path from list[dict] to list[tuple]
@@ -156,6 +167,7 @@ async def vln(robot, model, initial_distance_agent_obj):
             init_event = robot.controller.last_event
 
         # Initialize initial position of the agent
+        robot.controller.step(action="Done")
         try:
             robot.controller.step(action="Teleport", position=task["init_position"], rotation=task["init_orientation"])
         except IndexError:
@@ -175,27 +187,27 @@ async def vln(robot, model, initial_distance_agent_obj):
         if path_length < best_path_length:
             best_path_length = path_length
             dist_termination = distance_from_final_pos
-            initial_position_vec = [task["init_position"]["x"], task["init_position"]["y"], task["init_position"]["z"]]
-            dist_delta = compute_distance(event, task["object_id"], initial_position_vec) - dist_termination
-            dist_min = compute_minimum_distance_from_obj(event, task["object_id"], path)
+            dist_delta = vector_distance(task["init_position"], task["final_position"]) - dist_termination
+            dist_min = compute_minimum_distance_from_pos(task["final_position"], path)
 
         # SR and SPL information
-        if distance_from_final_pos < 1:
+        if distance_from_final_pos < 2:
             acc_success += 1
-            acc_spl = compute_single_spl(path, get_shortest_path_to_object(robot.controller, task["object_type"], task["init_position"]), True)
+            acc_spl = compute_single_spl(path, get_shortest_path_to_point(robot.controller, task["init_position"], task["final_position"]), True)
 
     # Save metrics about object task
-    results.loc["object", "SR"] = acc_success / len(object_task_data)
-    results.loc["object", "SPL"] = acc_spl / len(object_task_data)
-    results.loc["object", "dist_termination"] = dist_termination
-    results.loc["object", "dist_delta"] = dist_delta
-    results.loc["object", "dist_min"] = dist_min
+    results.loc["route", "SR"] = acc_success / len(route_task_data)
+    results.loc["route", "SPL"] = acc_spl / len(route_task_data)
+    results.loc["route", "dist_termination"] = dist_termination
+    results.loc["route", "dist_delta"] = dist_delta
+    results.loc["route", "dist_min"] = dist_min
 
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n------------------------        VLN - OBJECT results        ------------------------\n")
+    print(Fore.GREEN + "\n\n------------------------        VLN - ROUTE results        ------------------------\n")
     print(results)
+
 
     # Process object task
     previous_scene = ""
@@ -239,13 +251,14 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Save distance information of shortest path
         if path_length < best_path_length:
+            best_path_length = path_length
             dist_termination = distance_from_obj
             initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
             dist_delta = compute_distance(event, task["object_id"], initial_position_vec) - dist_termination
             dist_min = compute_minimum_distance_from_obj(event, task["object_id"], path)
 
         # SR and SPL information
-        if distance_from_obj < 1:
+        if distance_from_obj < 2:
             acc_success += 1
             acc_spl = compute_single_spl(path,get_shortest_path_to_object(robot.controller, task["object_type"],initial_position),True)
 

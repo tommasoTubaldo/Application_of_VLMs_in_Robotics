@@ -193,6 +193,7 @@ class GeminiAPI():
         :return: Prediction from Gemini
         """
         contents = list(self.conversation_history)
+        last_response = ""
 
         while True:
             # Binary exponential backoff parameters
