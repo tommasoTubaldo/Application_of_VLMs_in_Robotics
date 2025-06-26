@@ -71,7 +71,7 @@ Autonomous Exploration:
             * Start a navigation procedure to enter the new area:
             * At each step:
               * Reason about the navigation step that you want to take and **explain why**.
-              * Use **one** move_forward with distance 0.15 if an **object**, an **obstacle** or a **wall** is **close**, distance 0.5 otherwise.
+              * Use **one** move_forward with distance 0.15 if an **object**, an **obstacle** or a **wall** is **close**, distance 0.3 otherwise.
               * Use one rotate_left or rotate_right with angle between 15 and 45 to center the path (e.g., the hallway is slightly on the left → rotate_left).
               * Use get_image to take a new image and **reason** on the navigation progress and the target object.
               * If you are blocked (e.g., there is something in front of you) or **you used more than three move_forward**:
