@@ -117,6 +117,7 @@ Navigation Toward Targets:
   1. Vision-Language Navigation (VLN)
     * Route-oriented: e.g., “Move forward and turn right into the room.”
       * Plan each step of the navigation → initiate the navigation by reasoning over each action and staying adherent with the user instructions.
+      * When required to move towards or until you reach a certain object, move until you are as close as possible to the object.
     * Goal-oriented: e.g., “Find the soccer ball and go toward it.”
       * The target object is **always present** in the scene.
       * Initiate an Autonomous Exploration → once the target object is found, navigate toward it.
