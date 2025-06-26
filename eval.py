@@ -2,7 +2,7 @@ import asyncio, csv, random, math, os, ast
 import pandas as pd
 from tqdm import tqdm
 from google.genai import types
-from ai2thor.util.metrics import get_shortest_path_to_object, get_shortest_path_to_point, path_distance, compute_single_spl, vector_distance
+from ai2thor.util.metrics import get_shortest_path_to_object, path_distance, compute_single_spl, vector_distance
 from colorama import Fore, Style, init
 init(autoreset=True)
 
@@ -90,6 +90,19 @@ def compute_distance(event, objectId, position):
                 return obj["distance"]
 
     raise ValueError(f"Object with ID '{objectId}' not found in event metadata.")
+
+def get_shortest_path_to_point(controller, initial_position, target_position, allowed_error=0.0001):
+    event = controller.step(
+        action="GetShortestPathToPoint",
+        position=initial_position,
+        target=target_position,
+        allowedError=allowed_error,
+    )
+
+    if not event.metadata["lastActionSuccess"]:
+        raise ValueError(f"Failed to get path: {event.metadata['errorMessage']}")
+
+    return event.metadata["actionReturn"]["corners"]
 
 def compute_minimum_distance_from_pos(position, path):
     minimum_distance = float("inf")
@@ -193,7 +206,7 @@ async def vln(robot, model, initial_distance_agent_obj):
         # SR and SPL information
         if distance_from_final_pos < 2:
             acc_success += 1
-            acc_spl = compute_single_spl(path, get_shortest_path_to_point(robot.controller, task["init_position"], task["final_position"]), True)
+            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,initial_position=["init_position"],target_position=task["final_position"]), True)
 
     # Save metrics about object task
     results.loc["route", "SR"] = acc_success / len(route_task_data)
