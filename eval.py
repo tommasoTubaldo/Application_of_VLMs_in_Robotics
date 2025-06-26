@@ -354,7 +354,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
             correct_answers += 1
         elif check_visibility(event, question["object_id"]):
             wrong_but_seen_answers +=1
-        elif distance_from_obj < 1:
+        elif distance_from_obj < 2:
             wrong_but_on_goal_answers += 1
 
     # Save metrics about color questions
@@ -429,7 +429,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
             correct_answers += 1
         elif check_visibility(event, question["object_id"]):
             wrong_but_seen_answers += 1
-        elif distance_from_obj < 1:
+        elif distance_from_obj < 2:
             wrong_but_on_goal_answers += 1
 
     # Save metrics about preposition questions
