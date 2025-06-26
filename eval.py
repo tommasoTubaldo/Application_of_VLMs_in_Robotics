@@ -2,14 +2,15 @@ import asyncio, csv, random, math, os
 import pandas as pd
 from tqdm import tqdm
 from google.genai import types
-from ai2thor.util.metrics import get_shortest_path_to_object, path_distance, compute_single_spl
+from ai2thor.util.metrics import get_shortest_path_to_object, path_distance, compute_single_spl, vector_distance
 from colorama import Fore, Style, init
 init(autoreset=True)
 
 def extract_vln_data():
     object_task = []
+    route_task = []
 
-    # Read the CSV file
+    # Read the CSV files
     with open("data/vln.csv", newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -24,7 +25,22 @@ def extract_vln_data():
             if q_type == "object":
                 object_task.append(question_entry)
 
-    return object_task
+    with open("data/vln_route.csv", newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            question_entry = {
+                "scene_id": row["scene_id"],
+                "prompt": row["prompt"],
+                "init_position": row["init_position"],
+                "init_orientation": row["init_orientation"],
+                "final_position": row["final_position"]
+            }
+
+            q_type = row["task_type"]
+            if q_type == "route":
+                route_task.append(question_entry)
+
+    return route_task, object_task
 
 def extract_eqa_questions():
     questions = []
@@ -113,7 +129,7 @@ async def vln(robot, model, initial_distance_agent_obj):
     print(Fore.CYAN + "\n\n------------------        Vision Language Navigation        ------------------\n" + Style.RESET_ALL)
 
     # Extract VLN data
-    object_task_data = extract_vln_data()
+    route_task_data, object_task_data = extract_vln_data()
 
     # Initialize dataframe for metrics
     task_types = ["object"]
@@ -123,6 +139,63 @@ async def vln(robot, model, initial_distance_agent_obj):
     # Set visibility distance of the agent
     robot.controller.reset(visibilityDistance=100)
     distance_threshold = 0.2
+
+    # Process route task
+    previous_scene = ""
+    best_path_length = float("inf")
+    acc_success = 0
+    acc_spl = 0
+
+    for task in tqdm(route_task_data, desc="Processing ROUTE tasks"):
+        # Set the current scene if changed
+        if task["scene_id"] != previous_scene:
+            robot.controller.reset(scene=task["scene_id"])
+            previous_scene = task["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Initialize initial position of the agent
+        try:
+            robot.controller.step(action="Teleport", position=task["init_position"], rotation=task["init_orientation"])
+        except IndexError:
+            raise RuntimeError(f"Feasible initial position not available.")
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=task["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints,robot)
+
+        # Compute metrics information
+        distance_from_final_pos = vector_distance(event.metadata["agent"]["position"], task["final_position"])
+        path_length = path_distance(path)
+
+        # Save distance information of shortest path
+        if path_length < best_path_length:
+            best_path_length = path_length
+            dist_termination = distance_from_final_pos
+            initial_position_vec = [task["init_position"]["x"], task["init_position"]["y"], task["init_position"]["z"]]
+            dist_delta = compute_distance(event, task["object_id"], initial_position_vec) - dist_termination
+            dist_min = compute_minimum_distance_from_obj(event, task["object_id"], path)
+
+        # SR and SPL information
+        if distance_from_final_pos < 1:
+            acc_success += 1
+            acc_spl = compute_single_spl(path, get_shortest_path_to_object(robot.controller, task["object_type"], task["init_position"]), True)
+
+    # Save metrics about object task
+    results.loc["object", "SR"] = acc_success / len(object_task_data)
+    results.loc["object", "SPL"] = acc_spl / len(object_task_data)
+    results.loc["object", "dist_termination"] = dist_termination
+    results.loc["object", "dist_delta"] = dist_delta
+    results.loc["object", "dist_min"] = dist_min
+
+    # Show and save overall results as csv file
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    print(Fore.GREEN + "\n\n------------------------        VLN - OBJECT results        ------------------------\n")
+    print(results)
 
     # Process object task
     previous_scene = ""
@@ -257,6 +330,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
         # Save distance information of shortest path
         if path_length < best_path_length:
+            best_path_length = path_length
             dist_termination = distance_from_obj
             initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
             dist_delta = compute_distance(event, question["object_id"], initial_position_vec) - dist_termination
@@ -331,6 +405,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
         # Save distance information for shortest path
         if path_length < best_path_length:
+            best_path_length = path_length
             dist_termination = distance_from_obj
             initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
             dist_delta = compute_distance(event, question["object_id"], initial_position_vec) - dist_termination
