@@ -164,63 +164,6 @@ async def vln(robot, model, initial_distance_agent_obj):
     robot.controller.reset(visibilityDistance=100)
     distance_threshold = 0.2
 
-    # Process route task
-    previous_scene = ""
-    best_path_length = float("inf")
-    acc_success = 0
-    acc_spl = 0
-
-    for task in tqdm(route_task_data, desc="Processing ROUTE tasks"):
-        # Set the current scene if changed
-        if task["scene_id"] != previous_scene:
-            robot.controller.reset(scene=task["scene_id"])
-            previous_scene = task["scene_id"]
-
-            # Extract objects metadata
-            init_event = robot.controller.last_event
-
-        # Initialize initial position of the agent
-        robot.controller.step(action="Done")
-        try:
-            robot.controller.step(action="Teleport", position=task["init_position"], rotation=task["init_orientation"])
-        except IndexError:
-            raise RuntimeError(f"Feasible initial position not available.")
-
-        # Provide the question to the model
-        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=task["prompt"])]))
-
-        # Call Gemini in non-blocking way
-        last_response, event, path = await asyncio.to_thread(model.chat_no_prints,robot)
-
-        # Compute metrics information
-        distance_from_final_pos = vector_distance(event.metadata["agent"]["position"], task["final_position"])
-        path_length = path_distance(path)
-
-        # Save distance information of shortest path
-        if path_length < best_path_length:
-            best_path_length = path_length
-            dist_termination = distance_from_final_pos
-            dist_delta = vector_distance(task["init_position"], task["final_position"]) - dist_termination
-            dist_min = compute_minimum_distance_from_pos(task["final_position"], path)
-
-        # SR and SPL information
-        if distance_from_final_pos < 2:
-            acc_success += 1
-            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,initial_position=task["init_position"],target_position=task["final_position"]), True)
-
-    # Save metrics about object task
-    results.loc["route", "SR"] = acc_success / len(route_task_data)
-    results.loc["route", "SPL"] = acc_spl / len(route_task_data)
-    results.loc["route", "dist_termination"] = dist_termination
-    results.loc["route", "dist_delta"] = dist_delta
-    results.loc["route", "dist_min"] = dist_min
-
-    # Show and save overall results as csv file
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n------------------------        VLN - ROUTE results        ------------------------\n")
-    print(results)
-
 
     # Process object task
     previous_scene = ""
