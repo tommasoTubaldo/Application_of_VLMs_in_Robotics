@@ -206,7 +206,7 @@ async def vln(robot, model, initial_distance_agent_obj):
         # SR and SPL information
         if distance_from_final_pos < 2:
             acc_success += 1
-            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,initial_position=["init_position"],target_position=task["final_position"]), True)
+            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,initial_position=task["init_position"],target_position=task["final_position"]), True)
 
     # Save metrics about object task
     results.loc["route", "SR"] = acc_success / len(route_task_data)
