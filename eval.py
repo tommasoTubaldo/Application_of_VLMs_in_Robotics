@@ -164,14 +164,13 @@ async def vln(robot, model, initial_distance_agent_obj):
     robot.controller.reset(visibilityDistance=100)
     distance_threshold = 0.2
 
-
-    # Process object task
+    # Process route task
     previous_scene = ""
     best_path_length = float("inf")
     acc_success = 0
     acc_spl = 0
 
-    for task in tqdm(object_task_data, desc="Processing OBJECT tasks"):
+    for task in tqdm(route_task_data, desc="Processing ROUTE tasks"):
         # Set the current scene if changed
         if task["scene_id"] != previous_scene:
             robot.controller.reset(scene=task["scene_id"])
@@ -180,20 +179,12 @@ async def vln(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-        # Randomize agent position at fixed distance from the target object
-        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-
-        fixed_distance_positions = []
-        for pos in feasible_positions:
-            position_vec = [pos["x"], pos["y"], pos["z"]]
-            if abs(compute_distance(init_event, task["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
-                fixed_distance_positions.append(pos)
-
+        # Initialize initial position of the agent
+        robot.controller.step(action="Done")
         try:
-            initial_position = random.choice(fixed_distance_positions)
+            robot.controller.step(action="Teleport", position=task["init_position"], rotation=task["init_orientation"])
         except IndexError:
-            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
-        robot.controller.step(action="Teleport", position=initial_position)
+            raise RuntimeError(f"Feasible initial position not available.")
 
         # Provide the question to the model
         model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=task["prompt"])]))
@@ -202,35 +193,35 @@ async def vln(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
-        distance_from_obj = compute_distance(event, task["object_id"], None)
+        distance_from_final_pos = vector_distance(event.metadata["agent"]["position"], task["final_position"])
         path_length = path_distance(path)
 
         # Save distance information of shortest path
         if path_length < best_path_length:
             best_path_length = path_length
-            dist_termination = distance_from_obj
-            initial_position_vec = [initial_position["x"], initial_position["y"], initial_position["z"]]
-            dist_delta = compute_distance(event, task["object_id"], initial_position_vec) - dist_termination
-            dist_min = compute_minimum_distance_from_obj(event, task["object_id"], path)
+            dist_termination = distance_from_final_pos
+            dist_delta = vector_distance(task["init_position"], task["final_position"]) - dist_termination
+            dist_min = compute_minimum_distance_from_pos(task["final_position"], path)
 
         # SR and SPL information
-        if distance_from_obj < 2:
+        if distance_from_final_pos < 2:
             acc_success += 1
-            acc_spl = compute_single_spl(path,get_shortest_path_to_object(robot.controller, task["object_type"],initial_position),True)
+            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,
+                                                                          initial_position=task["init_position"],
+                                                                          target_position=task["final_position"]), True)
 
     # Save metrics about object task
-    results.loc["object","SR"] = acc_success / len(object_task_data)
-    results.loc["object","SPL"] = acc_spl / len(object_task_data)
-    results.loc["object","dist_termination"] = dist_termination
-    results.loc["object","dist_delta"] = dist_delta
-    results.loc["object","dist_min"] = dist_min
+    results.loc["route", "SR"] = acc_success / len(route_task_data)
+    results.loc["route", "SPL"] = acc_spl / len(route_task_data)
+    results.loc["route", "dist_termination"] = dist_termination
+    results.loc["route", "dist_delta"] = dist_delta
+    results.loc["route", "dist_min"] = dist_min
 
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
-    print(Fore.GREEN + "\n\n------------------------        VLN - OBJECT results        ------------------------\n")
+    print(Fore.GREEN + "\n\n------------------------        VLN - ROUTE results        ------------------------\n")
     print(results)
-    results.to_csv("results/vln_results.csv")
 
     # End session
     for task in asyncio.all_tasks():
