@@ -116,7 +116,7 @@ def compute_minimum_distance_from_pos(controller, position, path):
 
     return minimum_distance
 
-def compute_minimum_distance_from_obj(event, objectId, path):
+def compute_minimum_distance_from_obj(event, controller, objectId, path):
     # Convert path from list[dict] to list[tuple]
     path_vec = []
     for position in path:
@@ -128,7 +128,7 @@ def compute_minimum_distance_from_obj(event, objectId, path):
             min_distance = float("inf")
 
             for position in path_vec:
-                distance = path_distance(get_shortest_path_to_object(event, objectId, position))
+                distance = path_distance(get_shortest_path_to_object(controller, objectId, position))
 
                 if distance < min_distance:
                     min_distance = distance
@@ -299,7 +299,7 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, question["object_id"], path))
+        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -373,7 +373,7 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, question["object_id"], path))
+        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -471,7 +471,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, question["object_id"], path))
+        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -545,7 +545,7 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, question["object_id"], path))
+        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
 
         # Accuracy information
         if check_eqa_question(question, last_response):
