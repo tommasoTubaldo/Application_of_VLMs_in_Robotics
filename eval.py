@@ -109,7 +109,7 @@ def compute_minimum_distance_from_pos(controller, position, path):
     minimum_distance = float("inf")
 
     for path_pos in path:
-        distance = get_shortest_path_to_point(controller, path_pos, position)
+        distance = path_distance(get_shortest_path_to_point(controller, path_pos, position))
 
         if distance < minimum_distance:
             minimum_distance = distance
@@ -128,7 +128,7 @@ def compute_minimum_distance_from_obj(event, objectId, path):
             min_distance = float("inf")
 
             for position in path_vec:
-                distance = get_shortest_path_to_object(event, objectId, position)
+                distance = path_distance(get_shortest_path_to_object(event, objectId, position))
 
                 if distance < min_distance:
                     min_distance = distance
