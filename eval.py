@@ -198,8 +198,8 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         distance_from_final_pos_euclidian = vector_distance(event.metadata["agent"]["position"], task["final_position"])
-        distance_from_final_pos_at_start = get_shortest_path_to_point(robot.controller,task["init_position"],task["final_position"])
-        distance_from_final_pos_at_termination = get_shortest_path_to_point(robot.controller,event.metadata["agent"]["position"],task["final_position"])
+        distance_from_final_pos_at_start = path_distance(get_shortest_path_to_point(robot.controller,task["init_position"],task["final_position"]))
+        distance_from_final_pos_at_termination = path_distance(get_shortest_path_to_point(robot.controller,event.metadata["agent"]["position"],task["final_position"]))
 
         dist_termination.append(distance_from_final_pos_at_termination)
         dist_delta.append(distance_from_final_pos_at_start - distance_from_final_pos_at_termination)
@@ -292,10 +292,10 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position)
-        distance_from_obj_at_termination = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"])
+        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                 initial_position))
+        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                       event.metadata["agent"]["position"]))
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
@@ -366,10 +366,10 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position)
-        distance_from_obj_at_termination = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"])
+        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                 initial_position))
+        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                       event.metadata["agent"]["position"]))
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
