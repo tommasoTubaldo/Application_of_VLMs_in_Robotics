@@ -105,11 +105,11 @@ def get_shortest_path_to_point(controller, initial_position, target_position, al
 
     return event.metadata["actionReturn"]["corners"]
 
-def compute_minimum_distance_from_pos(position, path):
+def compute_minimum_distance_from_pos(controller, position, path):
     minimum_distance = float("inf")
 
     for path_pos in path:
-        distance = vector_distance(position, path_pos)
+        distance = get_shortest_path_to_point(controller, path_pos, position)
 
         if distance < minimum_distance:
             minimum_distance = distance
@@ -197,19 +197,16 @@ async def vln(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
-        distance_from_final_pos = vector_distance(event.metadata["agent"]["position"], task["final_position"])
-        euclidian_dist_at_term = compute_distance(event, task["object_id"], None)
-        distance_from_obj_at_start = get_shortest_path_to_object(robot.controller, task["object_id"],
-                                                                 task["init_position"])
-        distance_from_obj_at_termination = get_shortest_path_to_object(robot.controller, task["object_id"],
-                                                                       event.metadata["agent"]["position"])
+        distance_from_final_pos_euclidian = vector_distance(event.metadata["agent"]["position"], task["final_position"])
+        distance_from_final_pos_at_start = get_shortest_path_to_point(robot.controller,task["init_position"],task["final_position"])
+        distance_from_final_pos_at_termination = get_shortest_path_to_point(robot.controller,event.metadata["agent"]["position"],task["final_position"])
 
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, task["object_id"], path))
+        dist_termination.append(distance_from_final_pos_at_termination)
+        dist_delta.append(distance_from_final_pos_at_start - distance_from_final_pos_at_termination)
+        dist_min.append(compute_minimum_distance_from_pos(robot.controller, task["final_position"], path))
 
         # SR and SPL information
-        if distance_from_final_pos < 2:
+        if distance_from_final_pos_euclidian < 2:
             acc_success += 1
             acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,
                                                                           initial_position=task["init_position"],
