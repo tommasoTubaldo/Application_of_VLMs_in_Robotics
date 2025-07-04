@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from google.genai import types
-from ai2thor.util.metrics import get_shortest_path_to_object, path_distance, compute_single_spl, vector_distance
+from ai2thor.util.metrics import path_distance, compute_single_spl, vector_distance
+from thortils.navigation import get_shortest_path_to_object
 from colorama import Fore, Style, init
 init(autoreset=True)
 
@@ -128,12 +129,19 @@ def compute_minimum_distance_from_obj(event, controller, objectId, path):
             min_distance = float("inf")
 
             for position in path_vec:
-                distance = path_distance(get_shortest_path_to_object(controller, objectId, position))
+                try:
+                    distance = path_distance(get_shortest_path_to_object(
+                        controller,
+                        objectId,
+                        position,
+                        (0.0, 0.0, 0.0)
+                    ))
+                    if distance < min_distance:
+                        min_distance = distance
+                except Exception as e:
+                    continue
 
-                if distance < min_distance:
-                    min_distance = distance
-
-            return min_distance
+            return min_distance if min_distance != float("inf") else None
 
     raise ValueError(f"Object with ID '{objectId}' not found in event metadata.")
 
@@ -198,19 +206,29 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         distance_from_final_pos_euclidian = vector_distance(event.metadata["agent"]["position"], task["final_position"])
-        distance_from_final_pos_at_start = path_distance(get_shortest_path_to_point(robot.controller,task["init_position"],task["final_position"]))
-        distance_from_final_pos_at_termination = path_distance(get_shortest_path_to_point(robot.controller,event.metadata["agent"]["position"],task["final_position"]))
 
-        dist_termination.append(distance_from_final_pos_at_termination)
-        dist_delta.append(distance_from_final_pos_at_start - distance_from_final_pos_at_termination)
-        dist_min.append(compute_minimum_distance_from_pos(robot.controller, task["final_position"], path))
+        try:
+            shortest_path_start = get_shortest_path_to_point(robot.controller,task["init_position"],task["final_position"])
+            distance_from_final_pos_at_start = path_distance(shortest_path_start)
+
+            shortest_path_termination = get_shortest_path_to_point(robot.controller,event.metadata["agent"]["position"],task["final_position"])
+            distance_from_final_pos_at_termination = path_distance(shortest_path_termination)
+
+            dist_termination.append(distance_from_final_pos_at_termination)
+            dist_delta.append(distance_from_final_pos_at_start - distance_from_final_pos_at_termination)
+            dist_min.append(compute_minimum_distance_from_pos(robot.controller, task["final_position"], path))
+        except Exception as e:
+            continue
 
         # SR and SPL information
-        if distance_from_final_pos_euclidian < 2:
-            acc_success += 1
-            acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,
-                                                                          initial_position=task["init_position"],
-                                                                          target_position=task["final_position"]), True)
+        try:
+            if distance_from_final_pos_euclidian < 2:
+                acc_success += 1
+                acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,
+                                                                              initial_position=task["init_position"],
+                                                                              target_position=task["final_position"]), True)
+        except Exception:
+            continue
 
     # Save metrics about object task
     results.loc["route", "SR"] = acc_success / len(route_task_data)
@@ -292,14 +310,20 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position))
-        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"]))
 
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
+        try:
+            distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                     initial_position,(0.0,0.0,0.0)))
+            distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                           event.metadata["agent"]["position"],(0.0,0.0,0.0)))
+            min_distance_from_obj_along_path = compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path)
+
+            dist_termination.append(distance_from_obj_at_termination)
+            dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
+            if min_distance_from_obj_along_path is not None:
+                dist_min.append(min_distance_from_obj_along_path)
+        except Exception:
+            continue
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -366,14 +390,22 @@ async def vln(robot, model, initial_distance_agent_obj):
 
         # Compute metrics information
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position))
-        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"]))
+        try:
+            distance_from_obj_at_start = path_distance(
+                get_shortest_path_to_object(robot.controller, question["object_id"],
+                                            initial_position, (0.0, 0.0, 0.0)))
+            distance_from_obj_at_termination = path_distance(
+                get_shortest_path_to_object(robot.controller, question["object_id"],
+                                            event.metadata["agent"]["position"], (0.0, 0.0, 0.0)))
+            min_distance_from_obj_along_path = compute_minimum_distance_from_obj(event, robot.controller,
+                                                                                 question["object_id"], path)
 
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
+            dist_termination.append(distance_from_obj_at_termination)
+            dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
+            if min_distance_from_obj_along_path is not None:
+                dist_min.append(min_distance_from_obj_along_path)
+        except Exception:
+            continue
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -395,9 +427,6 @@ async def vln(robot, model, initial_distance_agent_obj):
     print(Fore.GREEN + "\n\n---------------------        EQA - PREPOSITION  results        ---------------------\n")
     print(results.loc["preposition"])
     print("\n\n")
-
-
-
 
 
     # End session
@@ -423,7 +452,6 @@ async def eqa(robot, model, initial_distance_agent_obj):
 
     # Process color questions
     previous_scene = ""
-    best_path_length = float("inf")
     correct_answers = 0
     wrong_but_seen_answers = 0
     wrong_but_on_goal_answers = 0
@@ -465,9 +493,12 @@ async def eqa(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
+        initial_position_vec = (initial_position["x"], initial_position["y"], initial_position["z"])
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = get_shortest_path_to_object(robot.controller, question["object_id"], initial_position)
-        distance_from_obj_at_termination = get_shortest_path_to_object(robot.controller, question["object_id"], event.metadata["agent"]["position"])
+        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"], initial_position_vec,(0.0,0.0,0.0)))
+        agent_final_position = event.metadata["agent"]["position"]
+        agent_final_position_vec = (agent_final_position["x"], agent_final_position["y"], agent_final_position["z"])
+        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],agent_final_position_vec,(0.0,0.0,0.0)))
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
@@ -537,11 +568,14 @@ async def eqa(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
+        initial_position_vec = (initial_position["x"], initial_position["y"], initial_position["z"])
         euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position)
-        distance_from_obj_at_termination = get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"])
+        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                 initial_position_vec,(0.0,0.0,0.0)))
+        agent_final_position = event.metadata["agent"]["position"]
+        agent_final_position_vec = (agent_final_position["x"], agent_final_position["y"], agent_final_position["z"])
+        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
+                                                                       agent_final_position_vec,(0.0,0.0,0.0)))
 
         dist_termination.append(distance_from_obj_at_termination)
         dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
@@ -568,74 +602,6 @@ async def eqa(robot, model, initial_distance_agent_obj):
     print(results.loc["preposition"])
     print("\n\n")
 
-    # Process existence questions
-    previous_scene = ""
-    correct_answers = 0
-
-    for question in tqdm(existence_questions, desc="Processing EXISTENCE questions"):
-        # Set the current scene if changed
-        if question["scene_id"] != previous_scene:
-            robot.controller.reset(scene=question["scene_id"])
-            previous_scene = question["scene_id"]
-
-            # Extract objects metadata
-            init_event = robot.controller.last_event
-
-        # Randomize agent position
-        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-        initial_position = random.choice(feasible_positions)
-        robot.controller.step(action="Teleport", position=initial_position)
-
-        # Reset model memory
-        model.conversation_history = []
-
-        # Provide the question to the model
-        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
-
-        # Call Gemini in non-blocking way
-        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
-
-        # Accuracy information
-        if check_eqa_question(question, last_response):
-            correct_answers += 1
-
-    # Save metrics about existence questions
-    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
-
-
-    # Process count questions
-    previous_scene = ""
-    correct_answers = 0
-
-    for question in tqdm(count_questions, desc="Processing COUNT questions"):
-        # Set the current scene if changed
-        if question["scene_id"] != previous_scene:
-            robot.controller.reset(scene=question["scene_id"])
-            previous_scene = question["scene_id"]
-
-            # Extract objects metadata
-            init_event = robot.controller.last_event
-
-        # Randomize agent position
-        feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-        initial_position = random.choice(feasible_positions)
-        robot.controller.step(action="Teleport", position=initial_position)
-
-        # Reset model memory
-        model.conversation_history = []
-
-        # Provide the question to the model
-        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=question["prompt"])]))
-
-        # Call Gemini in non-blocking way
-        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
-
-        # Accuracy information
-        if check_eqa_question(question, last_response):
-            correct_answers += 1
-
-    # Save metrics about count questions
-    results.loc["count", "answer_accuracy"] = correct_answers / len(count_questions)
 
 
     # Show and save overall results as csv file
