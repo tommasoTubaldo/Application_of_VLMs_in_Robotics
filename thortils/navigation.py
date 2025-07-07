@@ -396,8 +396,8 @@ def get_shortest_path_to_object(controller, object_id,
     # The algorithm is pretty fast so calling twice won't be an issue
 
     # Convert start_position to tuple if it's a list
-    if isinstance(start_position, list):
-        start_position = tuple(start_position)
+    if isinstance(start_position, dict):
+        start_position = (start_position["x"], start_position["y"], start_position["z"])
 
     target_position = thor_object_pose(controller, object_id, as_tuple=True)
     start_pose = (start_position, start_rotation)
