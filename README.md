@@ -13,7 +13,7 @@ We connect the reasoning abilities of VLMs with low-level robotic control using 
 
 This setup empowers the robot to understand and act upon natural language instructions in real-time, enabling complex embodied tasks such as:
 
-- Visual-Language Navigation (VLN)
+- Room-to-Room (R2R)
 
 - Embodied Question Answering (EQA)
 
@@ -25,8 +25,8 @@ This setup empowers the robot to understand and act upon natural language instru
 By leveraging foundation models, this project pushes toward general-purpose, intuitive robotic systems, where robots that can see, understand, and act in open-ended environments with minimal or absent task-specific training.
 
 ### 📊 Validation
-This repository contains the codebase and tools for executing the validation of the system on **RoboTHOR** by evaluating VLN and EQA tasks. Specifically, the following tasks have been defined:
-- **Vision Language Navigation**
+This repository contains the codebase and tools for executing the validation of the system on **RoboTHOR** by evaluating VLN tasks. Specifically, the following tasks have been defined:
+- **Room-to-Room**
      - Route-oriented tasks (e.g. "Go towards the front door but before the front door make a left, then through the archway, go to the middle of the middle room and stop”)
      - Goal-oriented tasks (e.g. "Find a tv and go toward it")
 - **Embodied Question Answering**
