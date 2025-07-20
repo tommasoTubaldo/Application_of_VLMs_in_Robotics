@@ -5,7 +5,7 @@ from rich.columns import Columns
 from rich import box
 
 def display_welcome(console):
-    # Title panel - clean and centered
+    # Title panel
     title_panel= Panel(
             Text("APPLICATION OF VISION LANGUAGE MODELS IN ROBOTICS", justify="center", style="bold"),
             box=box.DOUBLE,
