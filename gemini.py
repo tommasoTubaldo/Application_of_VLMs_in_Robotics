@@ -12,9 +12,9 @@ init(autoreset=True)
 class GeminiAPI():
     def __init__(self, model, temperature:float = 0.7, max_tokens:int = 1e5, generate_with_tools:bool = True):
         self.model = model
-        PROJECT_ID="gen-api-vertex-ai"
-        #PROJECT_ID="vertex-ai-463817"
-        LOCATION ="europe-west1"
+        PROJECT_ID = os.getenv("PROJECT_ID")
+        LOCATION = os.getenv("LOCATION")
+        API_MODE = os.getenv("API_MODE", "vertex").lower()
 
         # Load system instructions
         prompt_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Application_of_VLMs_in_Robotics/prompts'))
@@ -146,9 +146,13 @@ class GeminiAPI():
             tool_config=self.tool_config
         )
 
-        # Configure the client
-        #self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-        self.client = genai.Client(project=PROJECT_ID, location=LOCATION, vertexai=True)
+        # Configure the client based on API_MODE
+        if API_MODE == "gemini":
+            self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        elif API_MODE == "vertex":
+            self.client = genai.Client(project=PROJECT_ID, location=LOCATION, vertexai=True)
+        else:
+            raise ValueError(f"Invalid API_MODE: {API_MODE}. Must be 'gemini' or 'vertex'.")
 
     def image_to_base64(self, image: Union[np.ndarray, "np.uint8"]) -> str:
         """Converts an image in format numpy.uint8 in base64"""
@@ -212,6 +216,7 @@ class GeminiAPI():
                         contents=contents
                     )
                     end_time = time.time()
+                    #print(textwrap.fill(str(response), width=110))
                     break
                 except Exception as e:
                     if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
@@ -339,7 +344,7 @@ class GeminiAPI():
                         else:
                             raise RuntimeError(f"Exceeded retry limit due to repeated Server errors: {e}")
 
-                    elif "503" in str(e) or "UNAVAILABLE" in str(e):
+                    elif "503" in str(e) or "502" in str(e) or "UNAVAILABLE" in str(e):
                         if retries < max_retries:
                             #print(Fore.RED + f"[503 Error] Retrying in {retry_delay} seconds..." + Style.RESET_ALL)
                             time.sleep(retry_delay)
@@ -415,7 +420,6 @@ class GeminiAPI():
     async def chat_loop(self, robot):
         """Handle Gemini chat interaction in a single loop.
         """
-        print(Fore.CYAN + "\n----------   TurtleBot3 VLM Chat Interface   ----------" + Style.RESET_ALL)
         print("Type 'exit' or 'quit' to end the session.")
 
         while True:

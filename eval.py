@@ -9,24 +9,9 @@ from colorama import Fore, Style, init
 init(autoreset=True)
 
 def extract_vln_data():
-    object_task = []
     route_task = []
 
     # Read the CSV files
-    with open("data/vln.csv", newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            question_entry = {
-                "scene_id": row["scene_id"],
-                "prompt": row["prompt"],
-                "object_id": row["object_id"],
-                "object_type": row["object_type"]
-            }
-
-            q_type = row["task_type"]
-            if q_type == "object":
-                object_task.append(question_entry)
-
     with open("data/vln_route.csv", newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -42,7 +27,7 @@ def extract_vln_data():
             if q_type == "route":
                 route_task.append(question_entry)
 
-    return route_task, object_task
+    return route_task
 
 def extract_eqa_questions():
     questions = []
@@ -154,21 +139,108 @@ def check_visibility(event, objectId):
 
 
 async def vln(robot, model, initial_distance_agent_obj):
+    # Extract R2R data
+    route_task_data = extract_vln_data()
 
-    print(
-        Fore.BLUE + "\n\n------------------        Embodied Question Answering        ------------------\n" + Style.RESET_ALL)
+    # Initialize dataframe for metrics
+    task_types = ["route"]
+    metrics = ["SR", "SPL", "dist_termination", "dist_delta", "dist_min"]
+    results = pd.DataFrame(index=task_types, columns=metrics)
 
+    # Set visibility distance of the agent
+    robot.controller.reset(visibilityDistance=100)
+
+    # Process R2R task
+    previous_scene = ""
+    acc_success = 0
+    acc_spl = 0
+    dist_termination = []
+    dist_delta = []
+    dist_min = []
+
+    for task in tqdm(route_task_data, desc="Processing ROUTE tasks"):
+        # Set the current scene if changed
+        if task["scene_id"] != previous_scene:
+            robot.controller.reset(scene=task["scene_id"])
+            previous_scene = task["scene_id"]
+
+            # Extract objects metadata
+            init_event = robot.controller.last_event
+
+        # Initialize initial position of the agent
+        robot.controller.step(action="Done")
+        try:
+            robot.controller.step(action="Teleport", position=task["init_position"], rotation=task["init_orientation"])
+        except IndexError:
+            raise RuntimeError(f"Feasible initial position not available.")
+
+        # Provide the question to the model
+        model.conversation_history.append(types.Content(role="user", parts=[types.Part(text=task["prompt"])]))
+
+        # Call Gemini in non-blocking way
+        last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
+
+        # Compute metrics information
+        distance_from_final_pos_euclidian = vector_distance(event.metadata["agent"]["position"], task["final_position"])
+
+        try:
+            shortest_path_start = get_shortest_path_to_point(robot.controller, task["init_position"],
+                                                             task["final_position"])
+            distance_from_final_pos_at_start = path_distance(shortest_path_start)
+
+            shortest_path_termination = get_shortest_path_to_point(robot.controller,
+                                                                   event.metadata["agent"]["position"],
+                                                                   task["final_position"])
+            distance_from_final_pos_at_termination = path_distance(shortest_path_termination)
+
+            dist_termination.append(distance_from_final_pos_at_termination)
+            dist_delta.append(distance_from_final_pos_at_start - distance_from_final_pos_at_termination)
+            dist_min.append(compute_minimum_distance_from_pos(robot.controller, task["final_position"], path))
+        except Exception:
+            continue
+
+        # SR and SPL information
+        try:
+            if distance_from_final_pos_euclidian < 2:
+                acc_success += 1
+                acc_spl = compute_single_spl(path, get_shortest_path_to_point(controller=robot.controller,
+                                                                              initial_position=task["init_position"],
+                                                                              target_position=task["final_position"]),
+                                             True)
+        except Exception:
+            continue
+
+    # Save metrics about object task
+    results.loc["route", "SR"] = acc_success / len(route_task_data)
+    results.loc["route", "SPL"] = acc_spl / len(route_task_data)
+    results.loc["route", "dist_termination"] = np.mean(dist_termination)
+    results.loc["route", "dist_delta"] = np.mean(dist_delta)
+    results.loc["route", "dist_min"] = np.mean(dist_min)
+
+    # Show and save overall results as csv file
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    print(Fore.GREEN + "\n\n------------------------        R2R results        ------------------------\n")
+    print(results)
+    print("\n")
+
+    # End session
+    for task in asyncio.all_tasks():
+        task.cancel()
+
+
+async def eqa(robot, model, initial_distance_agent_obj):
     # Extract EQA data
     color_questions, preposition_questions, existence_questions, count_questions = extract_eqa_questions()
 
     # Initialize dataframe for metrics
     question_types = ["color", "preposition", "existence", "count"]
-    metrics = ["answer_accuracy", "vision_accuracy", "position_accuracy", "dist_termination", "dist_delta", "dist_min"]
+    metrics = ["answer_accuracy", "vision_accuracy", "dist_termination", "dist_delta", "dist_min"]
     results = pd.DataFrame(index=question_types, columns=metrics)
 
     # Set visibility distance of the agent
     robot.controller.reset(visibilityDistance=100)
-    distance_threshold = 0.3
+    distance_threshold = 0.7
 
     # Process color questions
     previous_scene = ""
@@ -213,18 +285,22 @@ async def vln(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
+        try:
+            distance_from_obj_at_start = path_distance(
+                get_shortest_path_to_object(robot.controller, question["object_id"],
+                                            initial_position, (0.0, 0.0, 0.0)))
+            distance_from_obj_at_termination = path_distance(
+                get_shortest_path_to_object(robot.controller, question["object_id"],
+                                            event.metadata["agent"]["position"], (0.0, 0.0, 0.0)))
+            min_distance_from_obj_along_path = compute_minimum_distance_from_obj(event, robot.controller,
+                                                                                 question["object_id"], path)
 
-        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position,(0.0,0.0,0.0)))
-        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       event.metadata["agent"]["position"],(0.0,0.0,0.0)))
-        min_distance_from_obj_along_path = compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path)
-
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        if min_distance_from_obj_along_path is not None:
-            dist_min.append(min_distance_from_obj_along_path)
-
+            dist_termination.append(distance_from_obj_at_termination)
+            dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
+            if min_distance_from_obj_along_path is not None:
+                dist_min.append(min_distance_from_obj_along_path)
+        except Exception:
+            continue
 
         # Accuracy information
         if check_eqa_question(question, last_response):
@@ -248,6 +324,9 @@ async def vln(robot, model, initial_distance_agent_obj):
     previous_scene = ""
     correct_answers = 0
     wrong_but_seen_answers = 0
+    dist_termination = []
+    dist_delta = []
+    dist_min = []
 
     for question in tqdm(preposition_questions, desc="Processing PREPOSITION questions"):
         # Set the current scene if changed
@@ -285,7 +364,6 @@ async def vln(robot, model, initial_distance_agent_obj):
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
         # Compute metrics information
-        euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
         try:
             distance_from_obj_at_start = path_distance(
                 get_shortest_path_to_object(robot.controller, question["object_id"],
@@ -300,8 +378,7 @@ async def vln(robot, model, initial_distance_agent_obj):
             dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
             if min_distance_from_obj_along_path is not None:
                 dist_min.append(min_distance_from_obj_along_path)
-        except Exception as e:
-            print(e)
+        except Exception:
             continue
 
         # Accuracy information
@@ -322,38 +399,11 @@ async def vln(robot, model, initial_distance_agent_obj):
     print(results.loc["preposition"])
     print("\n\n")
 
-
-    # End session
-    for task in asyncio.all_tasks():
-        task.cancel()
-
-
-async def eqa(robot, model, initial_distance_agent_obj):
-    print(Fore.BLUE + "\n\n------------------        Embodied Question Answering        ------------------\n" + Style.RESET_ALL)
-
-    # Extract EQA data
-    color_questions, preposition_questions, existence_questions, count_questions = extract_eqa_questions()
-
-    # Initialize dataframe for metrics
-    question_types = ["color", "preposition", "existence", "count"]
-    metrics = ["answer_accuracy", "vision_accuracy", "position_accuracy", "dist_termination", "dist_delta", "dist_min"]
-    results = pd.DataFrame(index=question_types, columns=metrics)
-
-    # Set visibility distance of the agent
-    robot.controller.reset(visibilityDistance=100)
-    distance_threshold = 0.2
-
-
-    # Process color questions
+    # Process existence questions
     previous_scene = ""
     correct_answers = 0
-    wrong_but_seen_answers = 0
-    wrong_but_on_goal_answers = 0
-    dist_termination = []
-    dist_delta = []
-    dist_min = []
 
-    for question in tqdm(color_questions, desc="Processing COLOR questions"):
+    for question in tqdm(existence_questions, desc="Processing EXISTENCE questions"):
         # Set the current scene if changed
         if question["scene_id"] != previous_scene:
             robot.controller.reset(scene=question["scene_id"])
@@ -362,19 +412,9 @@ async def eqa(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-        # Randomize agent position at fixed distance from the target object
+        # Randomize agent position
         feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-
-        fixed_distance_positions = []
-        for pos in feasible_positions:
-            position_vec = [pos["x"], pos["y"], pos["z"]]
-            if abs(compute_distance(init_event, question["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
-                fixed_distance_positions.append(pos)
-
-        try:
-            initial_position = random.choice(fixed_distance_positions)
-        except IndexError:
-            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
+        initial_position = random.choice(feasible_positions)
         robot.controller.step(action="Teleport", position=initial_position)
 
         # Reset model memory
@@ -386,48 +426,18 @@ async def eqa(robot, model, initial_distance_agent_obj):
         # Call Gemini in non-blocking way
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
-        # Compute metrics information
-        initial_position_vec = (initial_position["x"], initial_position["y"], initial_position["z"])
-        euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"], initial_position_vec,(0.0,0.0,0.0)))
-        agent_final_position = event.metadata["agent"]["position"]
-        agent_final_position_vec = (agent_final_position["x"], agent_final_position["y"], agent_final_position["z"])
-        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],agent_final_position_vec,(0.0,0.0,0.0)))
-
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
-
         # Accuracy information
         if check_eqa_question(question, last_response):
             correct_answers += 1
-        elif check_visibility(event, question["object_id"]):
-            wrong_but_seen_answers +=1
-        elif euclidian_dist_at_term < 2:
-            wrong_but_on_goal_answers += 1
 
-    # Save metrics about color questions
-    results.loc["color", "answer_accuracy"] = correct_answers / len(color_questions)
-    results.loc["color", "vision_accuracy"] = wrong_but_seen_answers / len(color_questions)
-    results.loc["color", "position_accuracy"] = wrong_but_on_goal_answers / len(color_questions)
-    results.loc["color", "dist_termination"] = np.mean(dist_termination)
-    results.loc["color", "dist_delta"] = np.mean(dist_delta)
-    results.loc["color", "dist_min"] = np.mean(dist_min)
+    # Save metrics about existence questions
+    results.loc["existence", "answer_accuracy"] = correct_answers / len(existence_questions)
 
-    # Print color results
-    print(Fore.GREEN + "\n\n-----------------------        EQA - COLOR  results        -----------------------\n")
-    print(results.loc["color"])
-    print("\n\n")
-
-
-    # Process preposition questions
+    # Process count questions
     previous_scene = ""
-    best_path_length = float("inf")
     correct_answers = 0
-    wrong_but_seen_answers = 0
-    wrong_but_on_goal_answers = 0
 
-    for question in tqdm(preposition_questions, desc="Processing PREPOSITION questions"):
+    for question in tqdm(count_questions, desc="Processing COUNT questions"):
         # Set the current scene if changed
         if question["scene_id"] != previous_scene:
             robot.controller.reset(scene=question["scene_id"])
@@ -436,21 +446,10 @@ async def eqa(robot, model, initial_distance_agent_obj):
             # Extract objects metadata
             init_event = robot.controller.last_event
 
-        # Randomize agent position at fixed distance from the target object
+        # Randomize agent position
         feasible_positions = robot.controller.step(action="GetReachablePositions").metadata["actionReturn"]
-
-        fixed_distance_positions = []
-        for pos in feasible_positions:
-            position_vec = [pos["x"], pos["y"], pos["z"]]
-            if abs(compute_distance(init_event, question["object_id"], position_vec) - initial_distance_agent_obj) < distance_threshold:
-                fixed_distance_positions.append(pos)
-
-        try:
-            initial_position = random.choice(fixed_distance_positions)
-        except IndexError:
-            raise RuntimeError(f"Feasible initial position not available, increment distance threshold.")
+        initial_position = random.choice(feasible_positions)
         robot.controller.step(action="Teleport", position=initial_position)
-        robot.controller.step(action="Done")
 
         # Reset model memory
         model.conversation_history = []
@@ -461,48 +460,19 @@ async def eqa(robot, model, initial_distance_agent_obj):
         # Call Gemini in non-blocking way
         last_response, event, path = await asyncio.to_thread(model.chat_no_prints, robot)
 
-        # Compute metrics information
-        initial_position_vec = (initial_position["x"], initial_position["y"], initial_position["z"])
-        euclidian_dist_at_term = compute_distance(event, question["object_id"], None)
-        distance_from_obj_at_start = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                 initial_position_vec,(0.0,0.0,0.0)))
-        agent_final_position = event.metadata["agent"]["position"]
-        agent_final_position_vec = (agent_final_position["x"], agent_final_position["y"], agent_final_position["z"])
-        distance_from_obj_at_termination = path_distance(get_shortest_path_to_object(robot.controller, question["object_id"],
-                                                                       agent_final_position_vec,(0.0,0.0,0.0)))
-
-        dist_termination.append(distance_from_obj_at_termination)
-        dist_delta.append(distance_from_obj_at_start - distance_from_obj_at_termination)
-        dist_min.append(compute_minimum_distance_from_obj(event, robot.controller, question["object_id"], path))
-
         # Accuracy information
         if check_eqa_question(question, last_response):
             correct_answers += 1
-        elif check_visibility(event, question["object_id"]):
-            wrong_but_seen_answers += 1
-        elif euclidian_dist_at_term < 2:
-            wrong_but_on_goal_answers += 1
 
-    # Save metrics about preposition questions
-    results.loc["preposition", "answer_accuracy"] = correct_answers / len(color_questions)
-    results.loc["preposition", "vision_accuracy"] = wrong_but_seen_answers / len(color_questions)
-    results.loc["preposition", "position_accuracy"] = wrong_but_on_goal_answers / len(color_questions)
-    results.loc["preposition", "dist_termination"] = np.mean(dist_termination)
-    results.loc["preposition", "dist_delta"] = np.mean(dist_delta)
-    results.loc["preposition", "dist_min"] = np.mean(dist_min)
-
-    # Print preposition results
-    print(Fore.GREEN + "\n\n---------------------        EQA - PREPOSITION  results        ---------------------\n")
-    print(results.loc["preposition"])
-    print("\n\n")
-
-
+    # Save metrics about count questions
+    results.loc["count", "answer_accuracy"] = correct_answers / len(count_questions)
 
     # Show and save overall results as csv file
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
     print(Fore.GREEN + "\n\n-------------------------        EQA  results        -------------------------\n")
     print(results)
+    print("\n")
     os.makedirs("results", exist_ok=True)
     results.to_csv("results/eqa_results.csv")
 
