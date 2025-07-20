@@ -45,8 +45,8 @@ With the Google Cloud Services, you are given $300 of credit to be used with the
 3. Configure environment variables:
    - Run these commands on your project directory:
         ```bash
-        export PROJECT_ID="your_project_id"
-        export LOCATION="your_location"
+        export PROJECT_ID="<your_project_id>"
+        export LOCATION="<your_location>"
         export API_MODE="vertex"
         ```
    
@@ -63,7 +63,7 @@ With the Google Cloud Services, you are given $300 of credit to be used with the
    - In your project directory:
         ```bash
         cd ~/your_project
-        export GEMINI_API_KEY="your_api_key"
+        export GEMINI_API_KEY="<your_api_key>"
         export API_MODE="gemini"
         ```
 
