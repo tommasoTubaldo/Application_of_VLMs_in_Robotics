@@ -1,6 +1,9 @@
 # Application of VLMs in Robotics
 
-This project demonstrates how Vision Language Models (VLMs) can enhance robotic systems through vision understanding and natural language interaction. It implements a function-calling interface that connects VLMs to robotic perception/control modules for two core tasks: Vision-Language Navigation (VLN) and Embodied Question Answering (EQA). The system is evaluated in AI2-THOR simulation, showing how foundation models can improve robotic perception and planning.
+This project demonstrates how Vision Language Models (VLMs) can enhance robotic systems through vision understanding and natural language interaction. It implements a function-calling interface that connects VLMs to robotic perception/control modules for two core tasks: Room-to-Room Navigation (R2R) and Embodied Question Answering (EQA). The system is evaluated in AI2-THOR simulation, showing how foundation models can improve robotic perception and planning.
+
+## Demo
+https://github.com/user-attachments/assets/77a83a23-825e-49d2-8555-c938ee22f736
 
 ## Getting Started
 ### Prerequisites
