@@ -1,4 +1,4 @@
-# Application of VLMs in Robotics
+# Vision Language-based Embodied Control through Interactive Reasoning
 
 This project demonstrates how Vision Language Models (VLMs) can enhance robotic systems through vision understanding and natural language interaction. It implements a function-calling interface that connects VLMs to robotic perception/control modules for two core tasks: Room-to-Room Navigation (R2R) and Embodied Question Answering (EQA). The system is evaluated in AI2-THOR simulation, showing how foundation models can improve robotic perception and planning.
 
