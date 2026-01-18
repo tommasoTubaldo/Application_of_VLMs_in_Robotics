@@ -2,7 +2,7 @@
 
 This project demonstrates how Vision Language Models (VLMs) can enhance robotic systems through vision understanding and natural language interaction. It implements a function-calling interface that connects VLMs to robotic perception/control modules for two core tasks: Room-to-Room Navigation (R2R) and Embodied Question Answering (EQA). The system is evaluated in AI2-THOR simulation, showing how foundation models can improve robotic perception and planning.
 
-<img width="899" height="750" alt="system_overview" src="https://github.com/user-attachments/assets/5979b6e4-d742-404f-8ee0-3b113cdd6c3c" />
+<img width="600" height="500" alt="system_overview" src="https://github.com/user-attachments/assets/5979b6e4-d742-404f-8ee0-3b113cdd6c3c" />
 
 ## Demo
 https://github.com/user-attachments/assets/77a83a23-825e-49d2-8555-c938ee22f736
